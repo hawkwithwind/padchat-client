@@ -1,0 +1,11 @@
+{
+    "development":{
+	"localPort": 3243
+    },
+    "production":{
+	"localPort": 3243
+    },
+    "test":{
+	"localPort": 3244
+    }
+}

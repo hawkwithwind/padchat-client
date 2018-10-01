@@ -1,0 +1,31 @@
+{
+  "name": "padchat-client",
+  "version": "1.0.0",
+  "description": "dockerize padchat-sdk and provide restful API",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./bin/www"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hawkwithwind/padchat-client.git"
+  },
+  "author": "hawkwithwind@gmail.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/hawkwithwind/padchat-client/issues"
+  },
+  "homepage": "https://github.com/hawkwithwind/padchat-client#readme",
+  "dependencies": {
+    "cookie-parser": "^1.4.3",
+    "debug": "^4.0.1",
+    "express": "^4.16.3",
+    "fs": "0.0.1-security",
+    "http-errors": "^1.7.1",
+    "jade": "^1.11.0",
+    "log4js": "^3.0.5",
+    "padchat-sdk": "^0.5.13",
+    "qrcode-terminal": "^0.12.0",
+    "util": "^0.11.0"
+  }
+}
