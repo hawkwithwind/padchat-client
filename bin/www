@@ -7,8 +7,10 @@
 var app = require('../app');
 var debug = require('debug')('test:server');
 var http = require('http');
+var baseBot = require('../libs/baseBot.socket');
 
 var config = require('../config/config.json')[app.get('env')];
+var bot = baseBot(config);
 
 /**
  * Get port from environment and store in Express.
@@ -16,6 +18,10 @@ var config = require('../config/config.json')[app.get('env')];
 
 var port = normalizePort(process.env.PORT || config.localPort || '3000');
 app.set('port', port);
+
+// set bot
+app.set('bot', bot);
+
 
 /**
  * Create HTTP server.

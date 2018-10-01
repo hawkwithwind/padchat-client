@@ -20,7 +20,7 @@ try {
 }
 
 try {
-  log4js.configure('../config/log4js.json')
+  log4js.configure('config/log4js.json')
 } catch (e) {
   console.error('载入log4js日志输出配置错误: ', e)
   process.exit(1);
@@ -33,96 +33,95 @@ logger.info('demo start!')
 
 const autoData = {
   wxData: '',
-  token : '',
+  token : ''
 }
 
-//let server = ''
-//    server = 'ws://127.0.0.1:7777'
-let server = 'ws://52.80.34.207:7777/'
-
 try {
-  const tmpBuf          = fs.readFileSync('./config.json')
-  const data            = JSON.parse(String(tmpBuf))
-        autoData.wxData = data.wxData
-        autoData.token  = data.token
+  const deviceInfo      = JSON.parse(String(fs.readFileSync('config/device.json')))
+        autoData.wxData = deviceInfo.wxData
+        autoData.token  = deviceInfo.token
   logger.info('载入设备参数与自动登陆数据：%o ', autoData)
 } catch (e) {
   logger.warn('没有在本地发现设备登录参数或解析数据失败！如首次登录请忽略！')
 }
 
-const wx = new Padchat(server)
-logger.info('当前连接接口服务器为：', server)
-let disconnectCount = 0      // 断开计数
-let connected       = false  // 成功连接标志
+module.exports = (config) => {
+  let server = `http://52.80.34.207:7777/${config.padchatToken}`
 
-wx
-  .on('close', (code, msg) => {
-    // 需要注意关闭代码为3201-3203的错误，重连也用，具体参考文档中`close`事件说明
-    if (code > 3200) {
-      logger.warn(`Websocket已关闭！code: ${code} - ${msg}`)
-      return
-    }
-    logger.info(`Websocket已关闭！code: ${code} - ${msg}`)
-    // 根据是否成功连接过判断本次是未能连接成功还是与服务器连接中断
-    if (connected) {
-      connected = false
-      disconnectCount++
-      logger.info(`第 ${disconnectCount} 次与服务器连接断开！现在将重试连接服务器。`)
-    } else {
-      logger.debug(`未能连接服务器！将重试连接服务器。`)
-    }
-    // 重新启动websocket连接
-    wx.start()
-  })
-  .on('open', async () => {
-    let ret
-    logger.info('连接成功!')
-    connected = true
+  const wx = new Padchat(server)
+  logger.info('padchat client started')
+  
+  let disconnectCount = 0      // 断开计数
+  let connected       = false  // 成功连接标志
 
-    // 非首次登录时最好使用以前成功登录时使用的设备参数，
-    // 否则可能会被tx服务器怀疑账号被盗，导致手机端被登出
-    ret = await wx.init()
-    if (!ret.success) {
-      logger.error('新建任务失败！', ret)
-      return
-    }
-    logger.info('新建任务成功, json: ', ret)
-
-    //先尝试使用断线重连方式登陆
-    if (autoData.token) {
-      ret = await wx.login('token', autoData)
-      if (ret.success) {
-        logger.info('断线重连请求成功！', ret)
-        return
+  wx
+    .on('close', (code, msg) => {
+      // 需要注意关闭代码为3201-3203的错误，重连也用，具体参考文档中`close`事件说明
+      if (code > 3200) {
+	logger.warn(`Websocket已关闭！code: ${code} - ${msg}`)
+	return
       }
-      logger.warn('断线重连请求失败！', ret)
-
-      ret = await wx.login('request', autoData)
-      if (ret.success) {
-        logger.info('自动登录请求成功！', ret)
-        return
+      logger.info(`Websocket已关闭！code: ${code} - ${msg}`)
+      // 根据是否成功连接过判断本次是未能连接成功还是与服务器连接中断
+      if (connected) {
+	connected = false
+	disconnectCount++
+	logger.info(`第 ${disconnectCount} 次与服务器连接断开！现在将重试连接服务器。`)
+      } else {
+	logger.debug(`未能连接服务器！将重试连接服务器。`)
       }
-      logger.warn('自动登录请求失败！', ret)
-    }
+      // 重新启动websocket连接
+      wx.start()
+    })
+    .on('open', async () => {
+      let ret
+      logger.info('连接成功!')
+      connected = true
 
-    ret = await wx.login('qrcode')
-    if (!ret.success) {
-      logger.error('使用qrcode登录模式失败！', ret)
-      return
-    }
-    logger.info('使用qrcode登录模式！')
-  })
-  .on('qrcode', data => {
-    // 如果存在url，则直接在终端中生成二维码并显示
-    if (data.url) {
-      logger.info(`登陆二维码内容为: "${data.url}"，请使用微信扫描下方二维码登陆!`)
-      qrcode.generate(data.url, { small: false })
-    } else {
-      logger.error(`未能获得登陆二维码!`)
-    }
-  })
-  .on('scan', data => {
-    switch (data.status) {
+      // 非首次登录时最好使用以前成功登录时使用的设备参数，
+      // 否则可能会被tx服务器怀疑账号被盗，导致手机端被登出
+      ret = await wx.init()
+      if (!ret.success) {
+	logger.error('新建任务失败！', ret)
+	return
+      }
+      logger.info('新建任务成功, json: ', ret)
+
+      //先尝试使用断线重连方式登陆
+      if (autoData.token) {
+	ret = await wx.login('token', autoData)
+	if (ret.success) {
+          logger.info('断线重连请求成功！', ret)
+          return
+	}
+	logger.warn('断线重连请求失败！', ret)
+
+	ret = await wx.login('request', autoData)
+	if (ret.success) {
+          logger.info('自动登录请求成功！', ret)
+          return
+	}
+	logger.warn('自动登录请求失败！', ret)
+      }
+
+      ret = await wx.login('qrcode')
+      if (!ret.success) {
+	logger.error('使用qrcode登录模式失败！', ret)
+	return
+      }
+      logger.info('使用qrcode登录模式！')
+    })
+    .on('qrcode', data => {
+      // 如果存在url，则直接在终端中生成二维码并显示
+      if (data.url) {
+	logger.info(`登陆二维码内容为: "${data.url}"，请使用微信扫描下方二维码登陆!`)
+	qrcode.generate(data.url, { small: false })
+      } else {
+	logger.error(`未能获得登陆二维码!`)
+      }
+    })
+    .on('scan', data => {
+      switch (data.status) {
       case 0:
         logger.info('等待扫码...', data)
         break;
@@ -152,18 +151,18 @@ wx
         //   phoneNumber: '18012345678',  // 微信账号绑定的手机号
         // }
         switch (data.subStatus) {
-          case 0:
-            logger.info('扫码成功！登陆成功！', data)
-            break;
-          case 1:
-            logger.info('扫码成功！登陆失败！', data)
-            break;
-          default:
-            logger.info('扫码成功！未知状态码！', data)
-            break;
+        case 0:
+          logger.info('扫码成功！登陆成功！', data)
+          break;
+        case 1:
+          logger.info('扫码成功！登陆失败！', data)
+          break;
+        default:
+          logger.info('扫码成功！未知状态码！', data)
+          break;
         }
         break;
-      // 如果等待登陆超时或手机上点击了取消登陆，需要重新调用登陆
+	// 如果等待登陆超时或手机上点击了取消登陆，需要重新调用登陆
       case 3:
         logger.info('二维码已过期！请重新调用登陆接口！', data)
         break;
@@ -173,92 +172,92 @@ wx
       default:
         logger.warn('未知登陆状态！请重新调用登陆接口！', data)
         break;
-    }
-  })
-  .on('login', async () => {
-    logger.info('微信账号登陆成功！')
-    let ret
-
-    ret = await wx.getMyInfo()
-    logger.info('当前账号信息：', ret.data)
-
-    // 主动同步通讯录
-    await wx.syncContact()
-
-    if (!autoData.wxData) {
-      // 如果已经存在设备参数，可不再获取
-      ret = await wx.getWxData()
-      if (!ret.success) {
-        logger.warn('获取设备参数未成功！ json:', ret)
-        return
       }
-      logger.info('获取设备参数成功, json: ', ret)
-      Object.assign(autoData, { wxData: ret.data.wxData })
-    }
+    })
+    .on('login', async () => {
+      logger.info('微信账号登陆成功！')
+      let ret
 
-    ret = await wx.getLoginToken()
-    if (!ret.success) {
-      logger.warn('获取自动登陆数据未成功！ json:', ret)
-      return
-    }
-    logger.info('获取自动登陆数据成功, json: ', ret)
-    Object.assign(autoData, { token: ret.data.token })
+      ret = await wx.getMyInfo()
+      logger.info('当前账号信息：', ret.data)
 
-    // NOTE: 这里将设备参数保存到本地，以后再次登录此账号时提供相同参数
-    fs.writeFileSync('./config.json', JSON.stringify(autoData, null, 2))
-    logger.info('设备参数已写入到 ./config.json文件')
-  })
-  .on('logout', ({ msg }) => {
-    logger.info('微信账号已退出！', msg)
-  })
-  .on('over', ({ msg }) => {
-    logger.info('任务实例已关闭！', msg)
-  })
-  .on('loaded', async () => {
-    logger.info('通讯录同步完毕！')
+      // 主动同步通讯录
+      await wx.syncContact()
 
-    // 主动触发同步消息
-    await wx.syncMsg()
+      if (!autoData.wxData) {
+	// 如果已经存在设备参数，可不再获取
+	ret = await wx.getWxData()
+	if (!ret.success) {
+          logger.warn('获取设备参数未成功！ json:', ret)
+          return
+	}
+	logger.info('获取设备参数成功, json: ', ret)
+	Object.assign(autoData, { wxData: ret.data.wxData })
+      }
 
-    const ret = await wx.sendMsg('filehelper', '你登录了！')
-    logger.info('发送信息结果：', ret)
-  })
-  .on('sns', (data, msg) => {
-    logger.info('收到朋友圈事件！请查看朋友圈新消息哦！', msg)
-  })
-  .on('push', async data => {
-    // 消息类型 data.mType
-    // 1  文字消息
-    // 2  好友信息推送，包含好友，群，公众号信息
-    // 3  收到图片消息
-    // 34  语音消息
-    // 35  用户头像buf
-    // 37  收到好友请求消息
-    // 42  名片消息
-    // 43  视频消息
-    // 47  表情消息
-    // 48  定位消息
-    // 49  APP消息(文件 或者 链接 H5)
-    // 50  语音通话
-    // 51  状态通知（如打开与好友/群的聊天界面）
-    // 52  语音通话通知
-    // 53  语音通话邀请
-    // 62  小视频
-    // 2000  转账消息
-    // 2001  收到红包消息
-    // 3000  群邀请
-    // 9999  系统通知
-    // 10000  微信通知信息. 微信群信息变更通知，多为群名修改，进群，离群信息，不包含群内聊天信息
-    // 10002  撤回消息
-    // --------------------------------
-    // 注意，如果是来自微信群的消息，data.content字段中包含发言人的wxid及其发言内容，需要自行提取
-    // 各类复杂消息，data.content中是xml格式的文本内容，需要自行从中提取各类数据。（如好友请求）
-    if ((data.mType !== 2) && !(data.mType === 10002 && data.fromUser === 'weixin')) {
-      // 输出除联系人以外的推送信息
-      dLog.info('push: \n%o', data)
-    }
-    let rawFile
-    switch (data.mType) {
+      ret = await wx.getLoginToken()
+      if (!ret.success) {
+	logger.warn('获取自动登陆数据未成功！ json:', ret)
+	return
+      }
+      logger.info('获取自动登陆数据成功, json: ', ret)
+      Object.assign(autoData, { token: ret.data.token })
+
+      // NOTE: 这里将设备参数保存到本地，以后再次登录此账号时提供相同参数
+      fs.writeFileSync('config/device.json', JSON.stringify(autoData, null, 2))
+      logger.info('设备参数已写入到 config/device.json文件')
+    })
+    .on('logout', ({ msg }) => {
+      logger.info('微信账号已退出！', msg)
+    })
+    .on('over', ({ msg }) => {
+      logger.info('任务实例已关闭！', msg)
+    })
+    .on('loaded', async () => {
+      logger.info('通讯录同步完毕！')
+
+      // 主动触发同步消息
+      await wx.syncMsg()
+
+      const ret = await wx.sendMsg('filehelper', '你登录了！')
+      logger.info('发送信息结果：', ret)
+    })
+    .on('sns', (data, msg) => {
+      logger.info('收到朋友圈事件！请查看朋友圈新消息哦！', msg)
+    })
+    .on('push', async data => {
+      // 消息类型 data.mType
+      // 1  文字消息
+      // 2  好友信息推送，包含好友，群，公众号信息
+      // 3  收到图片消息
+      // 34  语音消息
+      // 35  用户头像buf
+      // 37  收到好友请求消息
+      // 42  名片消息
+      // 43  视频消息
+      // 47  表情消息
+      // 48  定位消息
+      // 49  APP消息(文件 或者 链接 H5)
+      // 50  语音通话
+      // 51  状态通知（如打开与好友/群的聊天界面）
+      // 52  语音通话通知
+      // 53  语音通话邀请
+      // 62  小视频
+      // 2000  转账消息
+      // 2001  收到红包消息
+      // 3000  群邀请
+      // 9999  系统通知
+      // 10000  微信通知信息. 微信群信息变更通知，多为群名修改，进群，离群信息，不包含群内聊天信息
+      // 10002  撤回消息
+      // --------------------------------
+      // 注意，如果是来自微信群的消息，data.content字段中包含发言人的wxid及其发言内容，需要自行提取
+      // 各类复杂消息，data.content中是xml格式的文本内容，需要自行从中提取各类数据。（如好友请求）
+      if ((data.mType !== 2) && !(data.mType === 10002 && data.fromUser === 'weixin')) {
+	// 输出除联系人以外的推送信息
+	dLog.info('push: \n%o', data)
+      }
+      let rawFile
+      switch (data.mType) {
       case 2:
         logger.info('收到推送联系人：%s - %s', data.userName, data.nickName)
         break
@@ -332,7 +331,7 @@ wx
         if (rawFile.length > 0) {
           let   match  = data.content.match(/length="(\d+)"/) || []
           const length = match[1] || 0
-                match  = data.content.match(/voicelength="(\d+)"/) || []
+          match  = data.content.match(/voicelength="(\d+)"/) || []
           const ms     = match[1] || 0
           logger.info('语音数据语音长度：%d ms，xml内记录尺寸：%d', ms, length)
 
@@ -417,45 +416,49 @@ wx
       default:
         logger.info('收到推送消息：', data)
         break
-    }
-  })
-  .on('error', e => {
-    logger.error('ws 错误:', e.message)
-  })
-  .on('warn', e => {
-    logger.error('任务出现错误:', e.message)
-  })
-  .on('cmdRet', (cmd, ret) => {
-    //捕捉接口操作结果，补充接口文档用
-    dLog.info('%s ret: \n%s', cmd, util.inspect(ret, { depth: 10 }))
-  })
+      }
+    })
+    .on('error', e => {
+      logger.error('ws 错误:', e.message)
+    })
+    .on('warn', e => {
+      logger.error('任务出现错误:', e.message)
+    })
+    .on('cmdRet', (cmd, ret) => {
+      //捕捉接口操作结果，补充接口文档用
+      dLog.info('%s ret: \n%s', cmd, util.inspect(ret, { depth: 10 }))
+    })
 
-async function onMsg(data) {
-  const content        = data.content.replace(/^[\w:\n]*#/m, '')
-  let   [cmd, ...args] = content.split('\n')
+  async function onMsg(data) {
+    const content        = data.content.replace(/^[\w:\n]*#/m, '')
+    let   [cmd, ...args] = content.split('\n')
 
-  args = args.map(str => {
-    try {
-      str = JSON.parse(str)
-    } catch (e) {
+    args = args.map(str => {
+      try {
+	str = JSON.parse(str)
+      } catch (e) {
+      }
+      return str
+    })
+    if (cmd && wx[cmd] && typeof wx[cmd] === 'function') {
+      logger.info('执行函数 %s，参数：', cmd, args)
+      await wx[cmd](...args)
+	.then(ret => {
+          logger.info('执行函数 %s 结果：%o', cmd, ret)
+	})
+	.catch(e => {
+          logger.warn('执行函数 %s 异常：', e)
+	})
     }
-    return str
-  })
-  if (cmd && wx[cmd] && typeof wx[cmd] === 'function') {
-    logger.info('执行函数 %s，参数：', cmd, args)
-    await wx[cmd](...args)
-      .then(ret => {
-        logger.info('执行函数 %s 结果：%o', cmd, ret)
-      })
-      .catch(e => {
-        logger.warn('执行函数 %s 异常：', e)
-      })
   }
-}
-process.on('uncaughtException', e => {
-  logger.error('Main', 'uncaughtException:', e)
-})
 
-process.on('unhandledRejection', e => {
-  logger.error('Main', 'unhandledRejection:', e)
-})
+  // process.on('uncaughtException', e => {
+  //   logger.error('Main', 'uncaughtException:', e)
+  // })
+
+  // process.on('unhandledRejection', e => {
+  //   logger.error('Main', 'unhandledRejection:', e)
+  // })
+
+  return wx
+}

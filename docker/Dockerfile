@@ -12,4 +12,8 @@ RUN echo "export LC_ALL=zh_CN.UTF-8" >> /etc/profile
 RUN apk add --update nodejs-npm
 RUN npm config set registry=http://registry.npm.taobao.org
 
-ENTRYPOINT ["node"]
+USER node
+
+WORKDIR /home/myapp
+
+ENTRYPOINT ["npm"]

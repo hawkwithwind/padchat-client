@@ -11,7 +11,7 @@ var utils = require('./routes/util');
 var app = express();
 
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+app.set('view engine', 'pug');
 
 try {
   require('fs').mkdirSync('./logs')
@@ -29,9 +29,9 @@ try {
   process.exit(1);
 }
 
-const devlog = log4js.getLogger('dev');
+const weblog = log4js.getLogger('web');
 
-app.use(log4js.connectLogger(devlog, {format: ':method :url'}));
+app.use(log4js.connectLogger(weblog, {format: ':method :url'}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());

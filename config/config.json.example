@@ -1,9 +1,11 @@
 {
     "development":{
 	"localPort": 13243
+	, "padchatToken": ""
     },
     "production":{
 	"localPort": 13243
+	, "padchatToken": ""
     },
     "test":{
 	"localPort": 13244
