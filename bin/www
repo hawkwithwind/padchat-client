@@ -10,7 +10,6 @@ var http = require('http');
 var baseBot = require('../libs/baseBot.socket');
 
 var config = require('../config/config.json')[app.get('env')];
-var bot = baseBot(config);
 
 /**
  * Get port from environment and store in Express.
@@ -18,10 +17,6 @@ var bot = baseBot(config);
 
 var port = normalizePort(process.env.PORT || config.localPort || '3000');
 app.set('port', port);
-
-// set bot
-app.set('bot', bot);
-
 
 /**
  * Create HTTP server.
@@ -36,6 +31,10 @@ var server = http.createServer(app);
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
+
+// set bot
+app.set('bot', baseBot(config));
+
 
 /**
  * Normalize a port into a number, string, or false.

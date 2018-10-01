@@ -30,6 +30,7 @@ try {
 }
 
 const weblog = log4js.getLogger('web');
+app.set('weblog', weblog);
 
 app.use(log4js.connectLogger(weblog, {format: ':method :url'}));
 app.use(bodyParser.json());
