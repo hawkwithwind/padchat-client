@@ -1,5 +1,5 @@
 # Configs
-log4js.json
+*.json
 
 # Logs
 logs
