@@ -11,6 +11,7 @@ var log4js = require('log4js');
 var stringify = require('json-stringify');
 
 var baseBot = require('./libs/baseBot.socket');
+let router = require('./libs/wxSocketMsgRouter');
 var config = require('./config/config.json');
 
 var client = new services.ChatBotHubClient(`127.0.0.1:${config.hubport}`, grpc.credentials.createInsecure());
@@ -46,52 +47,107 @@ function newEventRequest(eventType, body) {
 var botClient = {
   clientId: config.clientId,
   clientType: "WECHATBOT",
+  flag: true,
   wxbot: undefined,
-  handleLogin: function(call) {
+  tunnel: undefined,
+  callback: function(data) {
+    log.info("CALLBACK");
+
+    if (this.tunnel === undefined) {
+      log.info("this.tunnel undefined");
+      log.info(`this = ${this}`);
+    } else {
+      log.info("this.tunnel is defined");
+    }
+    
+    if (this.tunnel === undefined) {
+      log.error('grpc connection not established while receiving wxlogin callback, exit.')
+      return
+    }
+    
+    log.info('wxbot callback ' +  stringify(data));
+    if (data === undefined || data.eventType === undefined) {
+      log.error('wxcallback data.eventType undefined');
+      return
+    }
+    
+    this.tunnel.write(newEventRequest(data.eventType, data.body));
+  },
+  
+  handleLoginRequest: function() {
+    log.info('handle login');
+    log.info(`this = ${this}`);
+    if (this.tunnel === undefined) {
+      log.info("this.tunnel undefined");
+    } else {
+      log.info("this.tunnel is defined");
+    }
+    
     if (this.wxbot) {
       log.error("cannot login again while current bot is running.");
       
-      call.write(
+      this.tunnel.write(
 	newEventRequest("LOGINFAILED", "cannot login again while current bot is running."));
     } else {
-      this.wxbot = baseBot(config);
+      log.info('begin login');
+      this.wxbot = baseBot(config, this);
+      this.wxbot.on('push', data => {
+	router.handle(data, this.wxbot)
+      })
     }
   }
 }
 
+//router.botClient = botClient;
+
+router.text(/.*/, async (msg, wx) => {
+  botClient.callback({eventType: 'MESSAGE', body: stringify(msg)})
+})
+
 async function runEventTunnel(bot) {
-  try {
-    var call = client.eventTunnel();
-    call.on('data', function(eventReply) {
-      var eventType = eventReply.getEventtype()
-      var body = eventReply.getBody()
-      var clientid = eventReply.getClientid()
-      var clientType = eventReply.getClienttype()
+  console.log("begin grpc connection");
+  botClient.flag = true;
+  botClient.tunnel = client.eventTunnel();
+  botClient.tunnel.on('data', function(eventReply) {
+    var eventType = eventReply.getEventtype()
+    var body = eventReply.getBody()
+    var clientid = eventReply.getClientid()
+    var clientType = eventReply.getClienttype()
 
-      if (eventType == 'PONG') {
-	log.info("PONG " + clientType + " " + clientid);
-      } else if (eventType == 'LOGIN') {
-	bot.handleLogin(call);
+    if (eventType == 'PONG') {
+      //log.info("PONG " + clientType + " " + clientid);
+    } else if (eventType == 'LOGIN') {
+      log.info("LOGIN CMD");
+      if (botClient.tunnel === undefined) {
+	log.info("botClient.tunnel undefined")	  
       } else {
-	log.info("unhandled message " + stringify(eventReply));
+	log.info("botClient.tunnel is defined")
       }
-    });
-
-    call.on('end', function() {
-      console.log("connection closed");
-    });
-
-    await call.write(newEventRequest("REGISTER", "HELLO"));
-
-    while (true) {
-      await call.write(newEventRequest("PING", ""));
-      await sleep(10 * 1000);
+      
+      bot.handleLoginRequest();
+    } else {
+      log.info("unhandled message " + stringify(eventReply));
     }
+  });
 
-    call.end();
-  } catch (e) {
-    console.log(e);
+  botClient.tunnel.on('error', function(e) {
+    console.log("grpc connection error", e);
+    botClient.flag = false;
+    botClient.tunnel.end();
+  });
+
+  botClient.tunnel.on('end', function() {
+    console.log("grpc connection closed");
+  });
+
+  await botClient.tunnel.write(newEventRequest("REGISTER", "HELLO"));
+
+  while (botClient.flag) {
+    await botClient.tunnel.write(newEventRequest("PING", ""));
+    await sleep(10 * 1000);
   }
+
+  botClient.tunnel.end();
 }
 
 function sleep(ms) {
@@ -100,8 +156,11 @@ function sleep(ms) {
   })
 }
 
-function main() {
-  runEventTunnel(botClient);
+async function main() {
+  while(true) {
+    await runEventTunnel(botClient);
+    await sleep(10 * 1000);
+  }
 }
 
 if (require.main === module) {

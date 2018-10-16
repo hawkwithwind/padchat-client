@@ -29,8 +29,6 @@ try {
 const logger = log4js.getLogger('app')
 const dLog   = log4js.getLogger('dev')
 
-logger.info('demo start!')
-
 const autoData = {
   wxData: '',
   token : ''
@@ -45,15 +43,15 @@ try {
   logger.warn('没有在本地发现设备登录参数或解析数据失败！如首次登录请忽略！')
 }
 
-module.exports = (config) => {
-  let server = `http://52.80.34.207:7777/${config.padchatToken}`
+module.exports = (config, botClient) => {
+  let server = `${config.padchatServer}:${config.padchatPort}/${config.padchatToken}`
 
   const wx = new Padchat(server)
   logger.info('padchat client started')
   
   let disconnectCount = 0      // 断开计数
   let connected       = false  // 成功连接标志
-
+  
   wx
     .on('close', (code, msg) => {
       // 需要注意关闭代码为3201-3203的错误，重连也用，具体参考文档中`close`事件说明
@@ -177,9 +175,9 @@ module.exports = (config) => {
     .on('login', async () => {
       logger.info('微信账号登陆成功！')
       let ret
-
       ret = await wx.getMyInfo()
       logger.info('当前账号信息：', ret.data)
+      let logindata = ret.data
 
       // 主动同步通讯录
       await wx.syncContact()
@@ -189,6 +187,7 @@ module.exports = (config) => {
 	ret = await wx.getWxData()
 	if (!ret.success) {
           logger.warn('获取设备参数未成功！ json:', ret)
+	  botClient.callback({eventType:'LOGINFAILED', body:`获取设备参数未成功！ json:${ret}`})
           return
 	}
 	logger.info('获取设备参数成功, json: ', ret)
@@ -198,6 +197,7 @@ module.exports = (config) => {
       ret = await wx.getLoginToken()
       if (!ret.success) {
 	logger.warn('获取自动登陆数据未成功！ json:', ret)
+	botClient.callback({eventType:'LOGINFAILED', body:`获取自动登陆数据未成功！ json:${ret}`})
 	return
       }
       logger.info('获取自动登陆数据成功, json: ', ret)
@@ -206,6 +206,7 @@ module.exports = (config) => {
       // NOTE: 这里将设备参数保存到本地，以后再次登录此账号时提供相同参数
       fs.writeFileSync('config/device.json', JSON.stringify(autoData, null, 2))
       logger.info('设备参数已写入到 config/device.json文件')
+      botClient.callback({eventType:'LOGINDONE', body:JSON.stringify(logindata)})
     })
     .on('logout', ({ msg }) => {
       logger.info('微信账号已退出！', msg)
