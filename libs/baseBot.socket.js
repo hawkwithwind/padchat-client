@@ -206,7 +206,7 @@ module.exports = (config, botClient) => {
       // NOTE: 这里将设备参数保存到本地，以后再次登录此账号时提供相同参数
       fs.writeFileSync('config/device.json', JSON.stringify(autoData, null, 2))
       logger.info('设备参数已写入到 config/device.json文件')
-      botClient.callback({eventType:'LOGINDONE', body:JSON.stringify(logindata)})
+      botClient.callback({eventType:'LOGINDONE', body:logindata})
     })
     .on('logout', ({ msg }) => {
       logger.info('微信账号已退出！', msg)

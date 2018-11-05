@@ -48,6 +48,7 @@ var botClient = {
   clientId: config.clientId,
   clientType: "WECHATBOT",
   flag: true,
+  logindata: undefined,
   wxbot: undefined,
   tunnel: undefined,
   callback: function(data) {
@@ -70,8 +71,12 @@ var botClient = {
       log.error('wxcallback data.eventType undefined');
       return
     }
-    
-    this.tunnel.write(newEventRequest(data.eventType, data.body));
+
+    if(data.eventType=="LOGINDONE") {
+      this.logindata = data.body;
+    }
+
+    this.tunnel.write(newEventRequest(data.eventType, JSON.stringify(data.body)));
   },
   
   handleLoginRequest: function() {
@@ -131,16 +136,21 @@ async function runEventTunnel(bot) {
   });
 
   botClient.tunnel.on('error', function(e) {
-    console.log("grpc connection error", e);
+    log.error("grpc connection error", e);
     botClient.flag = false;
     botClient.tunnel.end();
   });
 
   botClient.tunnel.on('end', function() {
-    console.log("grpc connection closed");
+    log.info("grpc connection closed");
   });
 
   await botClient.tunnel.write(newEventRequest("REGISTER", "HELLO"));
+
+  if(botClient.logindata != undefined) {
+    log.info("resend login data...");
+    await botClient.tunnel.write(newEventRequest("LOGINDONE", JSON.stringify(botClient.logindata)));
+  }
 
   while (botClient.flag) {
     await botClient.tunnel.write(newEventRequest("PING", ""));
