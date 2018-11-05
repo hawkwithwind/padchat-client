@@ -87,7 +87,11 @@ module.exports = (config, botClient) => {
 
       //先尝试使用断线重连方式登陆
       if (autoData.token) {
-	ret = await wx.login('auto', autoData).catch(function(error) {
+	ret = await wx.login('auto', autoData)
+
+	logger.info(">>>", ret)
+
+	ret.catch(function(error) {
 	  logger.info('login auto failed', error)
 	})
 	
