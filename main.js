@@ -110,7 +110,7 @@ router.text(/.*/, async (msg, wx) => {
 })
 
 async function runEventTunnel(bot) {
-  console.log("begin grpc connection");
+  log.info("begin grpc connection");
   botClient.flag = true;
   botClient.tunnel = client.eventTunnel();
   botClient.tunnel.on('data', function(eventReply) {
