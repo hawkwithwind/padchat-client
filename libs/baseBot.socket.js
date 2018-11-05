@@ -87,20 +87,17 @@ module.exports = (config, botClient) => {
 
       //先尝试使用断线重连方式登陆
       if (autoData.token) {
-	ret = await wx.login('auto', autoData)
-
-	logger.info(">>>", ret)
-
-	ret.catch(function(error) {
-	  logger.info('login auto failed', error)
-	})
-	
-	if (ret.success) {
-          logger.info('断线重连请求成功！', ret)
-          return
+	try {
+	  ret = await wx.login('auto', autoData)
+	  if (ret.success) {
+            logger.info('断线重连请求成功！', ret)
+            return
+	  }
+	} catch (e) {
+	  logger.info('login auto failed', e)
 	}
+		
 	logger.warn('断线重连请求失败！', ret)
-
 	ret = await wx.login('request', autoData)
 	if (ret.success) {
           logger.info('自动登录请求成功！', ret)
