@@ -45,6 +45,7 @@ try {
 
 module.exports = (config, botClient) => {
   let server = `${config.padchatServer}:${config.padchatPort}/${config.padchatToken}`
+  logger.info(`connect to server ${server}`)
 
   const wx = new Padchat(server)
   logger.info('padchat client started')
@@ -87,14 +88,10 @@ module.exports = (config, botClient) => {
 
       //先尝试使用断线重连方式登陆
       if (autoData.token) {
-	try {
-	  ret = await wx.login('auto', autoData)
-	  if (ret.success) {
-            logger.info('断线重连请求成功！', ret)
-            return
-	  }
-	} catch (e) {
-	  logger.info('login auto failed', e)
+	ret = await wx.login('auto', autoData)
+	if (ret.success) {
+          logger.info('断线重连请求成功！', ret)
+          return
 	}
 		
 	logger.warn('断线重连请求失败！', ret)
@@ -104,6 +101,18 @@ module.exports = (config, botClient) => {
           return
 	}
 	logger.warn('自动登录请求失败！', ret)
+
+	if (botClient.loginpass !== undefined) {
+	  logger.info('尝试密码登录', botClient.loginpass)
+	  ret = await wx.login('user', {
+	    wxData:autoData.wxData,
+	    username:loginpass.wxid,
+	    password:loginpass.password})
+	  if (ret.success) {
+	    logger.info('密码登录成功!', ret)
+	    return
+	  }
+	}	
       }
 
       ret = await wx.login('qrcode')
@@ -386,6 +395,11 @@ module.exports = (config, botClient) => {
           logger.info('收到一条来自 %s 的appmsg富媒体消息：', data.fromUser, data)
         }
         break
+
+      case 37:
+	logger.info('收到好友请求 %s :', data)
+	botClient.callback({eventType:'FREINDREQUEST', body:data})
+	break
 
       case 10002:
         if (data.fromUser === 'weixin') {

@@ -49,18 +49,10 @@ var botClient = {
   clientType: "WECHATBOT",
   flag: true,
   logindata: undefined,
+  loginpass: undefined,
   wxbot: undefined,
   tunnel: undefined,
   callback: function(data) {
-    log.info("CALLBACK");
-
-    if (this.tunnel === undefined) {
-      log.info("this.tunnel undefined");
-      log.info(`this = ${this}`);
-    } else {
-      log.info("this.tunnel is defined");
-    }
-    
     if (this.tunnel === undefined) {
       log.error('grpc connection not established while receiving wxlogin callback, exit.')
       return
@@ -79,13 +71,10 @@ var botClient = {
     this.tunnel.write(newEventRequest(data.eventType, JSON.stringify(data.body)));
   },
   
-  handleLoginRequest: function() {
+  handleLoginRequest: function(body) {
     log.info('handle login');
-    log.info(`this = ${this}`);
     if (this.tunnel === undefined) {
-      log.info("this.tunnel undefined");
-    } else {
-      log.info("this.tunnel is defined");
+      log.error('grpc tunnel undefined');
     }
     
     if (this.wxbot) {
@@ -94,7 +83,8 @@ var botClient = {
       this.tunnel.write(
 	newEventRequest("LOGINFAILED", "cannot login again while current bot is running."));
     } else {
-      log.info('begin login');
+      log.info('begin login', body);
+      this.loginpass = body;
       this.wxbot = baseBot(config, this);
       this.wxbot.on('push', data => {
 	router.handle(data, this.wxbot)
@@ -124,12 +114,10 @@ async function runEventTunnel(bot) {
     } else if (eventType == 'LOGIN') {
       log.info("LOGIN CMD");
       if (botClient.tunnel === undefined) {
-	log.info("botClient.tunnel undefined")	  
-      } else {
-	log.info("botClient.tunnel is defined")
+	log.error('grpc botClient.tunnel undefined')
       }
       
-      bot.handleLoginRequest();
+      bot.handleLoginRequest(body);
     } else {
       log.info("unhandled message " + stringify(eventReply));
     }
