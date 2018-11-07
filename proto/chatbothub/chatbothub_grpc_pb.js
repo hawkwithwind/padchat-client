@@ -85,8 +85,31 @@ function deserialize_chatbothub_LoginQQRequest(buffer_arg) {
   return chatbothub_pb.LoginQQRequest.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_chatbothub_LoginWechatReply(arg) {
+  if (!(arg instanceof chatbothub_pb.LoginWechatReply)) {
+    throw new Error('Expected argument of type chatbothub.LoginWechatReply');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_chatbothub_LoginWechatReply(buffer_arg) {
+  return chatbothub_pb.LoginWechatReply.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_chatbothub_LoginWechatRequest(arg) {
+  if (!(arg instanceof chatbothub_pb.LoginWechatRequest)) {
+    throw new Error('Expected argument of type chatbothub.LoginWechatRequest');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_chatbothub_LoginWechatRequest(buffer_arg) {
+  return chatbothub_pb.LoginWechatRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 
 var ChatBotHubService = exports.ChatBotHubService = {
+  // bots only use eventtunnel to communicate
   eventTunnel: {
     path: '/chatbothub.ChatBotHub/EventTunnel',
     requestStream: true,
@@ -98,6 +121,7 @@ var ChatBotHubService = exports.ChatBotHubService = {
     responseSerialize: serialize_chatbothub_EventReply,
     responseDeserialize: deserialize_chatbothub_EventReply,
   },
+  // below are for internal web api
   getBots: {
     path: '/chatbothub.ChatBotHub/GetBots',
     requestStream: false,
@@ -119,6 +143,17 @@ var ChatBotHubService = exports.ChatBotHubService = {
     requestDeserialize: deserialize_chatbothub_LoginQQRequest,
     responseSerialize: serialize_chatbothub_LoginQQReply,
     responseDeserialize: deserialize_chatbothub_LoginQQReply,
+  },
+  loginWechat: {
+    path: '/chatbothub.ChatBotHub/LoginWechat',
+    requestStream: false,
+    responseStream: false,
+    requestType: chatbothub_pb.LoginWechatRequest,
+    responseType: chatbothub_pb.LoginWechatReply,
+    requestSerialize: serialize_chatbothub_LoginWechatRequest,
+    requestDeserialize: deserialize_chatbothub_LoginWechatRequest,
+    responseSerialize: serialize_chatbothub_LoginWechatReply,
+    responseDeserialize: deserialize_chatbothub_LoginWechatReply,
   },
 };
 

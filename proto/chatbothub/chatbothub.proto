@@ -21,9 +21,13 @@ option java_outer_classname = "ChatBotHubProto";
 package chatbothub;
 
 service ChatBotHub {
+  // bots only use eventtunnel to communicate
   rpc EventTunnel (stream EventRequest) returns (stream EventReply) {}
-  rpc GetBots (BotsRequest) returns (BotsReply) {}
+
+  // below are for internal web api
+  rpc GetBots (BotsRequest) returns (BotsReply) {}  
   rpc LoginQQ (LoginQQRequest) returns (LoginQQReply) {}
+  rpc LoginWechat (LoginWechatRequest) returns (LoginWechatReply) {}
 }
 
 message EventRequest {
@@ -56,6 +60,7 @@ message BotsInfo {
   int64 lastPing = 5;
   string login = 6;
   int32 status = 7;
+  string filterInfo = 8;
 }
 
 message LoginQQRequest {
@@ -65,5 +70,15 @@ message LoginQQRequest {
 }
 
 message LoginQQReply {
+  string msg = 1;
+}
+
+message LoginWechatRequest {
+  string clientId = 1;
+  string wxid = 2;
+  string password = 3;
+}
+
+message LoginWechatReply {
   string msg = 1;
 }
