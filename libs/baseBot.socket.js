@@ -93,14 +93,7 @@ module.exports = (config, botClient) => {
           logger.info('断线重连请求成功！', ret)
           return
 	}
-		
 	logger.warn('断线重连请求失败！', ret)
-	ret = await wx.login('request', autoData)
-	if (ret.success) {
-          logger.info('自动登录请求成功！', ret)
-          return
-	}
-	logger.warn('自动登录请求失败！', ret)
 
 	if (botClient.loginpass !== undefined) {
 	  logger.info('尝试密码登录', botClient.loginpass)
@@ -112,7 +105,15 @@ module.exports = (config, botClient) => {
 	    logger.info('密码登录成功!', ret)
 	    return
 	  }
-	}	
+	  logger.warn('密码登录失败!', ret)
+	} else {
+	  ret = await wx.login('request', autoData)
+	  if (ret.success) {
+            logger.info('自动登录请求成功！', ret)
+            return
+	  }
+	  logger.warn('自动登录请求失败！', ret)
+	}
       }
 
       ret = await wx.login('qrcode')
