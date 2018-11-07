@@ -97,10 +97,11 @@ module.exports = (config, botClient) => {
 
 	if (botClient.loginpass !== undefined) {
 	  logger.info('尝试密码登录', botClient.loginpass)
-	  ret = await wx.login('user', {
-	    wxData:autoData.wxData,
-	    username:botClient.loginpass.wxid,
-	    password:botClient.loginpass.password})
+	  tempdata = {wxData: autoData.wxData,
+		      username: botClient.loginpass.wxid,
+		      password: botClient.loginpass.password}
+	  logger.info('trying', tempdata)
+	  ret = await wx.login('user', tempdata)
 	  if (ret.success) {
 	    logger.info('密码登录成功!', ret)
 	    return
