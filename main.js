@@ -84,7 +84,7 @@ var botClient = {
 	newEventRequest("LOGINFAILED", "cannot login again while current bot is running."));
     } else {
       log.info('begin login', body);
-      this.loginpass = body;
+      this.loginpass = JSON.parse(body);
       this.wxbot = baseBot(config, this);
       this.wxbot.on('push', data => {
 	router.handle(data, this.wxbot)
