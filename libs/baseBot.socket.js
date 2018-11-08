@@ -98,12 +98,10 @@ module.exports = (config, botClient) => {
 	if (botClient.loginpass !== undefined &&
 	    botClient.loginpass.wxid.length > 0 &&
 	    botClient.loginpass.password.length > 0) {
-	  logger.info('尝试密码登录', botClient.loginpass)
-	  var tempdata = {wxData: autoData.wxData,
-			  username: botClient.loginpass.wxid,
-			  password: botClient.loginpass.password}
-	  logger.info('trying', tempdata)
-	  ret = await wx.login('user', tempdata)
+	  logger.info('尝试密码登录')
+	  ret = await wx.login('user', {wxData: autoData.wxData,
+					username: botClient.loginpass.wxid,
+					password: botClient.loginpass.password})
 	  if (ret.success) {
 	    logger.info('密码登录成功!', ret)
 	    return
@@ -209,6 +207,7 @@ module.exports = (config, botClient) => {
     })
     .on('logout', ({ msg }) => {
       logger.info('微信账号已退出！', msg)
+      botClient.callback({eventType:'LOGOUTDONE', body:{}})
     })
     .on('over', ({ msg }) => {
       logger.info('任务实例已关闭！', msg)
