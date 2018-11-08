@@ -95,7 +95,9 @@ module.exports = (config, botClient) => {
 	}
 	logger.warn('断线重连请求失败！', ret)
 
-	if (botClient.loginpass !== undefined && !botClient.loginpass.wxid && !botClient.loginpass.password) {
+	if (botClient.loginpass !== undefined &&
+	    botClient.loginpass.wxid.length > 0 &&
+	    botClient.loginpass.password.length > 0) {
 	  logger.info('尝试密码登录', botClient.loginpass)
 	  var tempdata = {wxData: autoData.wxData,
 			  username: botClient.loginpass.wxid,
