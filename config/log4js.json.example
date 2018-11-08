@@ -1,11 +1,54 @@
-{
-    "development":{
-	"localPort": 13243
+{	
+  "appenders": {
+    "console": {
+      "type": "console"
     },
-    "production":{
-	"localPort": 13243
+    "rule-app": {
+      "type": "dateFile",
+      "filename": "logs/app.log",
+      "maxLogSize": 10485760,
+      "numBackups": 10,
+      "keepFileExt": true
     },
-    "test":{
-	"localPort": 13244
+    "dev": {
+      "type": "dateFile",
+      "filename": "logs/dev.log",
+      "maxLogSize": 10485760,
+      "keepFileExt": true
+    },
+    "rpc": {
+      "type": "dateFile",
+      "filename": "logs/rpc.log",
+      "maxLogSize": 10485760,
+      "keepFileExt": true
+    },
+    "error": {
+      "type": "dateFile",
+      "filename": "logs/error.log",
+      "maxLogSize": 10485760,
+      "keepFileExt": true
+    },
+    "rule-error": {
+      "type": "logLevelFilter",
+      "level": "warn",
+      "appender": "error"
     }
+  },
+  "categories": {
+    "default": {
+      "appenders": [
+        "rule-app",
+        "rule-error",
+        "console"
+      ],
+      "level": "all"
+    },
+    "dev": {
+      "appenders": [
+        "dev"
+      ],
+      "level": "all"
+    }
+  },
+  "level": "debug"
 }
