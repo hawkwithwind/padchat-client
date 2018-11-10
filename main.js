@@ -90,8 +90,12 @@ var botClient = {
     } else {
       log.info('begin login', body)
       let loginbody = JSON.parse(body)
-      this.loginPass = loginbody.loginPass
-      this.deviceData = loginbody.deviceData
+      this.loginPass = {login: loginbody.login, password: loginbody.password}
+      if (loginbody.loginInfo.length > 0) {
+	let deviceData = JSON.parse(loginbody.loginInfo)
+	log.info('device data', deviceData)
+	this.deviceData = deviceData
+      }
       this.wxbot = baseBot(config, this)
       this.wxbot.on('push', data => {
 	router.handle(data, this.wxbot)
