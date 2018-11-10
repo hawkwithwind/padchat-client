@@ -35,9 +35,9 @@ const autoData = {
 }
 
 try {
-  const deviceInfo      = JSON.parse(String(fs.readFileSync('config/device.json')))
-        autoData.wxData = deviceInfo.wxData
-        autoData.token  = deviceInfo.token
+  var deviceInfo      = JSON.parse(String(fs.readFileSync('config/device.json')))
+      autoData.wxData = deviceInfo.wxData
+      autoData.token  = deviceInfo.token
   logger.info('载入设备参数与自动登陆数据：%o ', autoData)
 } catch (e) {
   logger.warn('没有在本地发现设备登录参数')
@@ -86,9 +86,15 @@ module.exports = (config, botClient) => {
       }
       logger.info('新建任务成功, json: ', ret)
 
+      if (botClient.deviceData === undefined) {
+	botClient.deviceData = autoData
+      }
+
       //先尝试使用断线重连方式登陆
       if (botClient.deviceData!==undefined &&
+	  botClient.deviceData.wxData!==undefined &&
 	  botClient.deviceData.wxData.length > 0 &&
+	  botClient.deviceData.token!==undefined &&
 	  botClient.deviceData.token.length > 0 ) {
 	
 	ret = await wx.login('auto', botClient.deviceData)
