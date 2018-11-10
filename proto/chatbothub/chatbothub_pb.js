@@ -1155,7 +1155,8 @@ proto.chatbothub.LoginBotRequest.toObject = function(includeInstance, msg) {
     clientid: jspb.Message.getFieldWithDefault(msg, 1, ""),
     clienttype: jspb.Message.getFieldWithDefault(msg, 2, ""),
     login: jspb.Message.getFieldWithDefault(msg, 3, ""),
-    password: jspb.Message.getFieldWithDefault(msg, 4, "")
+    password: jspb.Message.getFieldWithDefault(msg, 4, ""),
+    devicedata: jspb.Message.getFieldWithDefault(msg, 5, "")
   };
 
   if (includeInstance) {
@@ -1207,6 +1208,10 @@ proto.chatbothub.LoginBotRequest.deserializeBinaryFromReader = function(msg, rea
     case 4:
       var value = /** @type {string} */ (reader.readString());
       msg.setPassword(value);
+      break;
+    case 5:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setDevicedata(value);
       break;
     default:
       reader.skipField();
@@ -1262,6 +1267,13 @@ proto.chatbothub.LoginBotRequest.serializeBinaryToWriter = function(message, wri
   if (f.length > 0) {
     writer.writeString(
       4,
+      f
+    );
+  }
+  f = message.getDevicedata();
+  if (f.length > 0) {
+    writer.writeString(
+      5,
       f
     );
   }
@@ -1325,6 +1337,21 @@ proto.chatbothub.LoginBotRequest.prototype.getPassword = function() {
 /** @param {string} value */
 proto.chatbothub.LoginBotRequest.prototype.setPassword = function(value) {
   jspb.Message.setField(this, 4, value);
+};
+
+
+/**
+ * optional string deviceData = 5;
+ * @return {string}
+ */
+proto.chatbothub.LoginBotRequest.prototype.getDevicedata = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
+};
+
+
+/** @param {string} value */
+proto.chatbothub.LoginBotRequest.prototype.setDevicedata = function(value) {
+  jspb.Message.setField(this, 5, value);
 };
 
 
