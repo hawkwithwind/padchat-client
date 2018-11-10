@@ -63,48 +63,26 @@ function deserialize_chatbothub_EventRequest(buffer_arg) {
   return chatbothub_pb.EventRequest.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
-function serialize_chatbothub_LoginQQReply(arg) {
-  if (!(arg instanceof chatbothub_pb.LoginQQReply)) {
-    throw new Error('Expected argument of type chatbothub.LoginQQReply');
+function serialize_chatbothub_LoginBotReply(arg) {
+  if (!(arg instanceof chatbothub_pb.LoginBotReply)) {
+    throw new Error('Expected argument of type chatbothub.LoginBotReply');
   }
   return new Buffer(arg.serializeBinary());
 }
 
-function deserialize_chatbothub_LoginQQReply(buffer_arg) {
-  return chatbothub_pb.LoginQQReply.deserializeBinary(new Uint8Array(buffer_arg));
+function deserialize_chatbothub_LoginBotReply(buffer_arg) {
+  return chatbothub_pb.LoginBotReply.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
-function serialize_chatbothub_LoginQQRequest(arg) {
-  if (!(arg instanceof chatbothub_pb.LoginQQRequest)) {
-    throw new Error('Expected argument of type chatbothub.LoginQQRequest');
+function serialize_chatbothub_LoginBotRequest(arg) {
+  if (!(arg instanceof chatbothub_pb.LoginBotRequest)) {
+    throw new Error('Expected argument of type chatbothub.LoginBotRequest');
   }
   return new Buffer(arg.serializeBinary());
 }
 
-function deserialize_chatbothub_LoginQQRequest(buffer_arg) {
-  return chatbothub_pb.LoginQQRequest.deserializeBinary(new Uint8Array(buffer_arg));
-}
-
-function serialize_chatbothub_LoginWechatReply(arg) {
-  if (!(arg instanceof chatbothub_pb.LoginWechatReply)) {
-    throw new Error('Expected argument of type chatbothub.LoginWechatReply');
-  }
-  return new Buffer(arg.serializeBinary());
-}
-
-function deserialize_chatbothub_LoginWechatReply(buffer_arg) {
-  return chatbothub_pb.LoginWechatReply.deserializeBinary(new Uint8Array(buffer_arg));
-}
-
-function serialize_chatbothub_LoginWechatRequest(arg) {
-  if (!(arg instanceof chatbothub_pb.LoginWechatRequest)) {
-    throw new Error('Expected argument of type chatbothub.LoginWechatRequest');
-  }
-  return new Buffer(arg.serializeBinary());
-}
-
-function deserialize_chatbothub_LoginWechatRequest(buffer_arg) {
-  return chatbothub_pb.LoginWechatRequest.deserializeBinary(new Uint8Array(buffer_arg));
+function deserialize_chatbothub_LoginBotRequest(buffer_arg) {
+  return chatbothub_pb.LoginBotRequest.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
 
@@ -133,27 +111,16 @@ var ChatBotHubService = exports.ChatBotHubService = {
     responseSerialize: serialize_chatbothub_BotsReply,
     responseDeserialize: deserialize_chatbothub_BotsReply,
   },
-  loginQQ: {
-    path: '/chatbothub.ChatBotHub/LoginQQ',
+  loginBot: {
+    path: '/chatbothub.ChatBotHub/LoginBot',
     requestStream: false,
     responseStream: false,
-    requestType: chatbothub_pb.LoginQQRequest,
-    responseType: chatbothub_pb.LoginQQReply,
-    requestSerialize: serialize_chatbothub_LoginQQRequest,
-    requestDeserialize: deserialize_chatbothub_LoginQQRequest,
-    responseSerialize: serialize_chatbothub_LoginQQReply,
-    responseDeserialize: deserialize_chatbothub_LoginQQReply,
-  },
-  loginWechat: {
-    path: '/chatbothub.ChatBotHub/LoginWechat',
-    requestStream: false,
-    responseStream: false,
-    requestType: chatbothub_pb.LoginWechatRequest,
-    responseType: chatbothub_pb.LoginWechatReply,
-    requestSerialize: serialize_chatbothub_LoginWechatRequest,
-    requestDeserialize: deserialize_chatbothub_LoginWechatRequest,
-    responseSerialize: serialize_chatbothub_LoginWechatReply,
-    responseDeserialize: deserialize_chatbothub_LoginWechatReply,
+    requestType: chatbothub_pb.LoginBotRequest,
+    responseType: chatbothub_pb.LoginBotReply,
+    requestSerialize: serialize_chatbothub_LoginBotRequest,
+    requestDeserialize: deserialize_chatbothub_LoginBotRequest,
+    responseSerialize: serialize_chatbothub_LoginBotReply,
+    responseDeserialize: deserialize_chatbothub_LoginBotReply,
   },
 };
 

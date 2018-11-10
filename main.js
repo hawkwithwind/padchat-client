@@ -35,11 +35,11 @@ try {
 const log = log4js.getLogger('rpc');
 
 function newEventRequest(eventType, body) {
-  req = new messages.EventRequest();
-  req.setEventtype(eventType);
-  req.setBody(body);
-  req.setClientid(botClient.clientId);
-  req.setClienttype(botClient.clientType);
+  req = new messages.EventRequest()
+  req.setEventtype(eventType)
+  req.setBody(body)
+  req.setClientid(botClient.clientId)
+  req.setClienttype(botClient.clientType)
 
   return req;
 }
@@ -48,8 +48,9 @@ var botClient = {
   clientId: config.clientId,
   clientType: "WECHATBOT",
   flag: true,
-  logindata: undefined,
-  loginpass: undefined,
+  loginData: undefined,
+  loginPass: undefined,
+  deviceData: undefined,
   wxbot: undefined,
   tunnel: undefined,
   callback: function(data) {
@@ -58,34 +59,36 @@ var botClient = {
       return
     }
     
-    log.info('wxbot callback ' +  stringify(data));
+    log.info('wxbot callback ' +  stringify(data))
     if (data === undefined || data.eventType === undefined) {
-      log.error('wxcallback data.eventType undefined');
+      log.error('wxcallback data.eventType undefined')
       return
     }
 
     if(data.eventType=="LOGINDONE") {
-      this.logindata = data.body;
+      this.loginData = data.body
     }
 
-    this.tunnel.write(newEventRequest(data.eventType, JSON.stringify(data.body)));
+    this.tunnel.write(newEventRequest(data.eventType, JSON.stringify(data.body)))
   },
   
   handleLoginRequest: function(body) {
-    log.info('handle login');
+    log.info('handle login')
     if (this.tunnel === undefined) {
-      log.error('grpc tunnel undefined');
+      log.error('grpc tunnel undefined')
     }
     
     if (this.wxbot) {
-      log.error("cannot login again while current bot is running.");
+      log.error("cannot login again while current bot is running.")
       
       this.tunnel.write(
-	newEventRequest("LOGINFAILED", "cannot login again while current bot is running."));
+	newEventRequest("LOGINFAILED", "cannot login again while current bot is running."))
     } else {
-      log.info('begin login', body);
-      this.loginpass = JSON.parse(body);
-      this.wxbot = baseBot(config, this);
+      log.info('begin login', body)
+      let loginbody = JSON.parse(body)
+      this.loginPass = loginbody.loginPass
+      this.deviceData = loginbody.deviceData
+      this.wxbot = baseBot(config, this)
       this.wxbot.on('push', data => {
 	router.handle(data, this.wxbot)
       })
@@ -135,7 +138,7 @@ async function runEventTunnel(bot) {
 
   await botClient.tunnel.write(newEventRequest("REGISTER", "HELLO"));
 
-  if(botClient.logindata != undefined) {
+  if(botClient.loginData != undefined) {
     log.info("resend login data...");
     await botClient.tunnel.write(newEventRequest("LOGINDONE", JSON.stringify(botClient.logindata)));
   }

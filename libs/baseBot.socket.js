@@ -40,7 +40,7 @@ try {
         autoData.token  = deviceInfo.token
   logger.info('载入设备参数与自动登陆数据：%o ', autoData)
 } catch (e) {
-  logger.warn('没有在本地发现设备登录参数或解析数据失败！如首次登录请忽略！')
+  logger.warn('没有在本地发现设备登录参数')
 }
 
 module.exports = (config, botClient) => {
@@ -81,40 +81,45 @@ module.exports = (config, botClient) => {
       // 否则可能会被tx服务器怀疑账号被盗，导致手机端被登出
       ret = await wx.init()
       if (!ret.success) {
-	logger.error('新建任务失败！', ret)
+	logger.error('新建任务失败', ret)
 	return
       }
       logger.info('新建任务成功, json: ', ret)
 
       //先尝试使用断线重连方式登陆
-      if (autoData.token) {
-	ret = await wx.login('auto', autoData)
+      if (botClient.deviceData!==undefined &&
+	  botClient.deviceData.wxData.length > 0 &&
+	  botClient.deviceData.token.length > 0 ) {
+	
+	ret = await wx.login('auto', botClient.deviceData)
 	if (ret.success) {
-          logger.info('断线重连请求成功！', ret)
+          logger.info('断线重连请求成功', ret)
           return
 	}
-	logger.warn('断线重连请求失败！', ret)
+	logger.warn('断线重连请求失败', ret)
 
-	if (botClient.loginpass !== undefined &&
-	    botClient.loginpass.wxid.length > 0 &&
-	    botClient.loginpass.password.length > 0) {
+	if (botClient.loginPass !== undefined &&
+	    botClient.loginPass.login.length > 0 &&
+	    botClient.loginPass.password.length > 0) {
 	  logger.info('尝试密码登录')
-	  ret = await wx.login('user', {wxData: autoData.wxData,
-					username: botClient.loginpass.wxid,
-					password: botClient.loginpass.password})
+	  ret = await wx.login('user', {wxData: botClient.deviceData.wxData,
+					username: botClient.loginPass.login,
+					password: botClient.loginPass.password})
 	  if (ret.success) {
-	    logger.info('密码登录成功!', ret)
+	    logger.info('密码登录成功', ret)
 	    return
 	  }
-	  logger.warn('密码登录失败!', ret)
+	  logger.warn('密码登录失败', ret)
 	} else {
-	  ret = await wx.login('request', autoData)
+	  ret = await wx.login('request', botClient.deviceData)
 	  if (ret.success) {
-            logger.info('自动登录请求成功！', ret)
+            logger.info('自动登录请求成功', ret)
             return
 	  }
-	  logger.warn('自动登录请求失败！', ret)
+	  logger.warn('自动登录请求失败', ret)
 	}
+      } else {
+	logger.warn('未提供设备登录参数')
       }
 
       ret = await wx.login('qrcode')
@@ -129,8 +134,9 @@ module.exports = (config, botClient) => {
       if (data.url) {
 	logger.info(`登陆二维码内容为: "${data.url}"，请使用微信扫描下方二维码登陆!`)
 	qrcode.generate(data.url, { small: false })
+	botClient.callback({eventType:'LOGINSCAN', body: {url: data.url}})
       } else {
-	logger.error(`未能获得登陆二维码!`)
+	logger.error(`未能获得登陆二维码`)
       }
     })
     .on('scan', data => {
@@ -192,22 +198,29 @@ module.exports = (config, botClient) => {
       let ret
       ret = await wx.getMyInfo()
       logger.info('当前账号信息：', ret.data)
-      let logindata = ret.data
+      botClient.loginData = ret.data
 
       // 主动同步通讯录
       await wx.syncContact()
-
-      await saveAutoData()
+      await saveAutoData(botClient)
       
-      botClient.callback({eventType:'LOGINDONE', body:logindata})
+      botClient.callback({eventType:'LOGINDONE', body: {
+	userName: botClient.loginData.userName,
+	wxData: botClient.deviceData.wxData,
+	token: botClient.deviceData.token,
+      }})
     })
     .on('autoLogin', async () => {
       // 自动重连后需要保存新的自动登陆数据
-      await saveAutoData()
+      await saveAutoData(botClient)
+      botClient.callback({eventType:'UPDATETOKEN', body:{
+	userName: botClient.loginData.userName,
+	token: botClient.deviceData.token,
+      }})
     })
     .on('logout', ({ msg }) => {
       logger.info('微信账号已退出！', msg)
-      botClient.callback({eventType:'LOGOUTDONE', body:{}})
+      botClient.callback({eventType:'LOGOUTDONE', body:msg})
     })
     .on('over', ({ msg }) => {
       logger.info('任务实例已关闭！', msg)
@@ -424,11 +437,10 @@ module.exports = (config, botClient) => {
       logger.error('任务出现错误:', e.message)
     })
 
-
   /**
    * @description 保存自动登陆数据
    */
-  async function saveAutoData() {
+  async function saveAutoData(botClient) {
     let ret = await wx.getWxData()
     if (!ret.success) {
       logger.warn('获取设备参数未成功！ json:', ret)
@@ -448,6 +460,8 @@ module.exports = (config, botClient) => {
     // NOTE: 这里将设备参数保存到本地，以后再次登录此账号时提供相同参数
     fs.writeFileSync('config/device.json', JSON.stringify(autoData, null, 2))
     logger.info('设备参数已写入到 config/device.json文件')
+
+    botClient.deviceData = autoData;
   }
 
   async function onMsg(data) {
