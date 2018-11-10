@@ -131,7 +131,7 @@ async function runEventTunnel(bot) {
   });
 
   botClient.tunnel.on('error', function(e) {
-    log.error("grpc connection error", e);
+    log.error("grpc connection error", "code", e.code, e.details);
     botClient.flag = false;
     botClient.tunnel.end();
   });
