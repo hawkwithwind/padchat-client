@@ -88,12 +88,11 @@ var botClient = {
       this.tunnel.write(
 	newEventRequest("LOGINFAILED", "cannot login again while current bot is running."))
     } else {
-      log.info('begin login', body)
+      log.info('begin login')
       let loginbody = JSON.parse(body)
       this.loginPass = {login: loginbody.login, password: loginbody.password}
       if (loginbody.loginInfo.length > 0) {
-	let deviceData = JSON.parse(loginbody.loginInfo)
-	log.info('device data', deviceData)
+	let deviceData = JSON.parse(loginbody.loginInfo)	
 	this.deviceData = deviceData
       }
       this.wxbot = baseBot(config, this)

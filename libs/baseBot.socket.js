@@ -38,7 +38,7 @@ try {
   var deviceInfo      = JSON.parse(String(fs.readFileSync('config/device.json')))
       autoData.wxData = deviceInfo.wxData
       autoData.token  = deviceInfo.token
-  logger.info('载入设备参数与自动登陆数据：%o ', autoData)
+  logger.info('载入设备参数与自动登陆数据')
 } catch (e) {
   logger.warn('没有在本地发现设备登录参数')
 }
