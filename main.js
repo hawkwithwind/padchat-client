@@ -163,7 +163,11 @@ function sleep(ms) {
 
 async function main() {
   while(true) {
-    await runEventTunnel(botClient);
+    try {
+      await runEventTunnel(botClient);
+    } catch (e) {
+      log.error("connection failed, retrying ... ", e)
+    }
     await sleep(10 * 1000);
   }
 }
