@@ -1,6 +1,6 @@
 #!/bin/bash
 
-docker run -it --rm --net=host --name $1 \
+docker run -d --rm --net=host --name $1 \
        -v `pwd`/libs:/home/work/libs \
        -v `pwd`/proto:/home/work/proto \
        -v `pwd`/node_modules:/home/work/node_modules \
