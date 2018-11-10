@@ -203,12 +203,8 @@ module.exports = (config, botClient) => {
       // 主动同步通讯录
       await wx.syncContact()
       await saveAutoData(botClient)
-      
-      botClient.callback({eventType:'LOGINDONE', body: {
-	userName: botClient.loginData.userName,
-	wxData: botClient.deviceData.wxData,
-	token: botClient.deviceData.token,
-      }})
+
+      botClient.logindone()
     })
     .on('autoLogin', async () => {
       // 自动重连后需要保存新的自动登陆数据

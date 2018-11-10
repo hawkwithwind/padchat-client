@@ -53,6 +53,14 @@ var botClient = {
   deviceData: undefined,
   wxbot: undefined,
   tunnel: undefined,
+  logindone: function(data) {
+    callback({eventType:'LOGINDONE', body: {
+      userName: this.loginData.userName,
+      wxData: this.deviceData.wxData,
+      token: this.deviceData.token,
+    }})
+  },
+  
   callback: function(data) {
     if (this.tunnel === undefined) {
       log.error('grpc connection not established while receiving wxlogin callback, exit.')
@@ -63,10 +71,6 @@ var botClient = {
     if (data === undefined || data.eventType === undefined) {
       log.error('wxcallback data.eventType undefined')
       return
-    }
-
-    if(data.eventType=="LOGINDONE") {
-      this.loginData = data.body
     }
 
     this.tunnel.write(newEventRequest(data.eventType, JSON.stringify(data.body)))
@@ -140,7 +144,7 @@ async function runEventTunnel(bot) {
 
   if(botClient.loginData != undefined) {
     log.info("resend login data...");
-    await botClient.tunnel.write(newEventRequest("LOGINDONE", JSON.stringify(botClient.logindata)));
+    await botClient.logindone();
   }
 
   while (botClient.flag) {
