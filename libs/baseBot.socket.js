@@ -86,10 +86,6 @@ module.exports = (config, botClient) => {
       }
       logger.info('新建任务成功, json: ', ret)
 
-      if (botClient.deviceData === undefined) {
-	botClient.deviceData = autoData
-      }
-
       //先尝试使用断线重连方式登陆
       if (botClient.deviceData!==undefined &&
 	  botClient.deviceData.wxData!==undefined &&
