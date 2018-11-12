@@ -50,14 +50,14 @@ var botClient = {
   flag: true,
   loginData: undefined,
   loginPass: undefined,
-  deviceData: undefined,
+  loginInfo: undefined,
   wxbot: undefined,
   tunnel: undefined,
   logindone: function(data) {
     this.callback({eventType:'LOGINDONE', body: {
       userName: this.loginData.userName,
-      wxData: this.deviceData.wxData,
-      token: this.deviceData.token,
+      wxData: this.loginInfo.wxData,
+      token: this.loginInfo.token,
     }})
   },
   
@@ -92,8 +92,8 @@ var botClient = {
       let loginbody = JSON.parse(body)
       this.loginPass = {login: loginbody.login, password: loginbody.password}
       if (loginbody.loginInfo.length > 0) {
-	let deviceData = JSON.parse(loginbody.loginInfo)	
-	this.deviceData = deviceData
+	let loginInfo = JSON.parse(loginbody.loginInfo)	
+	this.loginInfo = loginInfo
       }
       this.wxbot = baseBot(config, this)
       this.wxbot.on('push', data => {

@@ -30,14 +30,15 @@ const logger = log4js.getLogger('app')
 const dLog   = log4js.getLogger('dev')
 
 const autoData = {
+  userName: '',
   wxData: '',
   token : ''
 }
 
 try {
-  var deviceInfo      = JSON.parse(String(fs.readFileSync('config/device.json')))
-      autoData.wxData = deviceInfo.wxData
-      autoData.token  = deviceInfo.token
+  var loginInfo       = JSON.parse(String(fs.readFileSync('config/login.json')))
+      autoData.wxData = loginInfo.wxData
+      autoData.token  = loginInfo.token
   logger.info('载入设备参数与自动登陆数据')
 } catch (e) {
   logger.warn('没有在本地发现设备登录参数')
@@ -87,13 +88,13 @@ module.exports = (config, botClient) => {
       logger.info('新建任务成功, json: ', ret)
 
       //先尝试使用断线重连方式登陆
-      if (botClient.deviceData!==undefined &&
-	  botClient.deviceData.wxData!==undefined &&
-	  botClient.deviceData.wxData.length > 0 &&
-	  botClient.deviceData.token!==undefined &&
-	  botClient.deviceData.token.length > 0 ) {
+      if (botClient.loginInfo!==undefined &&
+	  botClient.loginInfo.wxData!==undefined &&
+	  botClient.loginInfo.wxData.length > 0 &&
+	  botClient.loginInfo.token!==undefined &&
+	  botClient.loginInfo.token.length > 0 ) {
 	
-	ret = await wx.login('auto', botClient.deviceData)
+	ret = await wx.login('auto', botClient.loginInfo)
 	if (ret.success) {
           logger.info('断线重连请求成功', ret)
           return
@@ -104,7 +105,7 @@ module.exports = (config, botClient) => {
 	    botClient.loginPass.login.length > 0 &&
 	    botClient.loginPass.password.length > 0) {
 	  logger.info('尝试密码登录')
-	  ret = await wx.login('user', {wxData: botClient.deviceData.wxData,
+	  ret = await wx.login('user', {wxData: botClient.loginInfo.wxData,
 					username: botClient.loginPass.login,
 					password: botClient.loginPass.password})
 	  if (ret.success) {
@@ -113,7 +114,7 @@ module.exports = (config, botClient) => {
 	  }
 	  logger.warn('密码登录失败', ret)
 	} else {
-	  ret = await wx.login('request', botClient.deviceData)
+	  ret = await wx.login('request', botClient.loginInfo)
 	  if (ret.success) {
             logger.info('自动登录请求成功', ret)
             return
@@ -213,7 +214,7 @@ module.exports = (config, botClient) => {
       await saveAutoData(botClient)
       botClient.callback({eventType:'UPDATETOKEN', body:{
 	userName: botClient.loginData.userName,
-	token: botClient.deviceData.token,
+	token: botClient.loginInfo.token,
       }})
     })
     .on('logout', ({ msg }) => {
@@ -454,12 +455,13 @@ module.exports = (config, botClient) => {
     }
     logger.info('获取自动登陆数据成功, json: ', ret)
     Object.assign(autoData, { token: ret.data.token })
+    Object.assign(autoData, { userName: botClient.loginData.userName })
 
     // NOTE: 这里将设备参数保存到本地，以后再次登录此账号时提供相同参数
-    fs.writeFileSync('config/device.json', JSON.stringify(autoData, null, 2))
-    logger.info('设备参数已写入到 config/device.json文件')
+    fs.writeFileSync('config/login.json', JSON.stringify(autoData, null, 2))
+    logger.info('设备参数已写入到 config/login.json文件')
 
-    botClient.deviceData = autoData;
+    botClient.loginInfo = autoData;
   }
 
   async function onMsg(data) {

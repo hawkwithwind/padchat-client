@@ -476,12 +476,19 @@ proto.chatbothub.EventReply.prototype.setClienttype = function(value) {
  * @constructor
  */
 proto.chatbothub.BotsRequest = function(opt_data) {
-  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
+  jspb.Message.initialize(this, opt_data, 0, -1, proto.chatbothub.BotsRequest.repeatedFields_, null);
 };
 goog.inherits(proto.chatbothub.BotsRequest, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
   proto.chatbothub.BotsRequest.displayName = 'proto.chatbothub.BotsRequest';
 }
+/**
+ * List of repeated fields within this message type.
+ * @private {!Array<number>}
+ * @const
+ */
+proto.chatbothub.BotsRequest.repeatedFields_ = [1];
+
 
 
 if (jspb.Message.GENERATE_TO_OBJECT) {
@@ -511,7 +518,7 @@ proto.chatbothub.BotsRequest.prototype.toObject = function(opt_includeInstance) 
  */
 proto.chatbothub.BotsRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    secret: jspb.Message.getFieldWithDefault(msg, 1, "")
+    loginsList: jspb.Message.getRepeatedField(msg, 1)
   };
 
   if (includeInstance) {
@@ -550,7 +557,7 @@ proto.chatbothub.BotsRequest.deserializeBinaryFromReader = function(msg, reader)
     switch (field) {
     case 1:
       var value = /** @type {string} */ (reader.readString());
-      msg.setSecret(value);
+      msg.addLogins(value);
       break;
     default:
       reader.skipField();
@@ -581,9 +588,9 @@ proto.chatbothub.BotsRequest.prototype.serializeBinary = function() {
  */
 proto.chatbothub.BotsRequest.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
-  f = message.getSecret();
+  f = message.getLoginsList();
   if (f.length > 0) {
-    writer.writeString(
+    writer.writeRepeatedString(
       1,
       f
     );
@@ -592,17 +599,31 @@ proto.chatbothub.BotsRequest.serializeBinaryToWriter = function(message, writer)
 
 
 /**
- * optional string secret = 1;
- * @return {string}
+ * repeated string logins = 1;
+ * @return {!Array.<string>}
  */
-proto.chatbothub.BotsRequest.prototype.getSecret = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
+proto.chatbothub.BotsRequest.prototype.getLoginsList = function() {
+  return /** @type {!Array.<string>} */ (jspb.Message.getRepeatedField(this, 1));
 };
 
 
-/** @param {string} value */
-proto.chatbothub.BotsRequest.prototype.setSecret = function(value) {
-  jspb.Message.setField(this, 1, value);
+/** @param {!Array.<string>} value */
+proto.chatbothub.BotsRequest.prototype.setLoginsList = function(value) {
+  jspb.Message.setField(this, 1, value || []);
+};
+
+
+/**
+ * @param {!string} value
+ * @param {number=} opt_index
+ */
+proto.chatbothub.BotsRequest.prototype.addLogins = function(value, opt_index) {
+  jspb.Message.addToRepeatedField(this, 1, value, opt_index);
+};
+
+
+proto.chatbothub.BotsRequest.prototype.clearLoginsList = function() {
+  this.setLoginsList([]);
 };
 
 
@@ -827,8 +848,9 @@ proto.chatbothub.BotsInfo.toObject = function(includeInstance, msg) {
     startat: jspb.Message.getFieldWithDefault(msg, 4, 0),
     lastping: jspb.Message.getFieldWithDefault(msg, 5, 0),
     login: jspb.Message.getFieldWithDefault(msg, 6, ""),
-    status: jspb.Message.getFieldWithDefault(msg, 7, 0),
-    filterinfo: jspb.Message.getFieldWithDefault(msg, 8, "")
+    logininfo: jspb.Message.getFieldWithDefault(msg, 7, ""),
+    status: jspb.Message.getFieldWithDefault(msg, 8, 0),
+    filterinfo: jspb.Message.getFieldWithDefault(msg, 9, "")
   };
 
   if (includeInstance) {
@@ -890,10 +912,14 @@ proto.chatbothub.BotsInfo.deserializeBinaryFromReader = function(msg, reader) {
       msg.setLogin(value);
       break;
     case 7:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setLogininfo(value);
+      break;
+    case 8:
       var value = /** @type {number} */ (reader.readInt32());
       msg.setStatus(value);
       break;
-    case 8:
+    case 9:
       var value = /** @type {string} */ (reader.readString());
       msg.setFilterinfo(value);
       break;
@@ -968,17 +994,24 @@ proto.chatbothub.BotsInfo.serializeBinaryToWriter = function(message, writer) {
       f
     );
   }
+  f = message.getLogininfo();
+  if (f.length > 0) {
+    writer.writeString(
+      7,
+      f
+    );
+  }
   f = message.getStatus();
   if (f !== 0) {
     writer.writeInt32(
-      7,
+      8,
       f
     );
   }
   f = message.getFilterinfo();
   if (f.length > 0) {
     writer.writeString(
-      8,
+      9,
       f
     );
   }
@@ -1076,32 +1109,47 @@ proto.chatbothub.BotsInfo.prototype.setLogin = function(value) {
 
 
 /**
- * optional int32 status = 7;
- * @return {number}
+ * optional string loginInfo = 7;
+ * @return {string}
  */
-proto.chatbothub.BotsInfo.prototype.getStatus = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 7, 0));
+proto.chatbothub.BotsInfo.prototype.getLogininfo = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 7, ""));
 };
 
 
-/** @param {number} value */
-proto.chatbothub.BotsInfo.prototype.setStatus = function(value) {
+/** @param {string} value */
+proto.chatbothub.BotsInfo.prototype.setLogininfo = function(value) {
   jspb.Message.setField(this, 7, value);
 };
 
 
 /**
- * optional string filterInfo = 8;
+ * optional int32 status = 8;
+ * @return {number}
+ */
+proto.chatbothub.BotsInfo.prototype.getStatus = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 8, 0));
+};
+
+
+/** @param {number} value */
+proto.chatbothub.BotsInfo.prototype.setStatus = function(value) {
+  jspb.Message.setField(this, 8, value);
+};
+
+
+/**
+ * optional string filterInfo = 9;
  * @return {string}
  */
 proto.chatbothub.BotsInfo.prototype.getFilterinfo = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 8, ""));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 9, ""));
 };
 
 
 /** @param {string} value */
 proto.chatbothub.BotsInfo.prototype.setFilterinfo = function(value) {
-  jspb.Message.setField(this, 8, value);
+  jspb.Message.setField(this, 9, value);
 };
 
 
@@ -1156,7 +1204,8 @@ proto.chatbothub.LoginBotRequest.toObject = function(includeInstance, msg) {
     clienttype: jspb.Message.getFieldWithDefault(msg, 2, ""),
     login: jspb.Message.getFieldWithDefault(msg, 3, ""),
     password: jspb.Message.getFieldWithDefault(msg, 4, ""),
-    logininfo: jspb.Message.getFieldWithDefault(msg, 5, "")
+    notifyurl: jspb.Message.getFieldWithDefault(msg, 5, ""),
+    logininfo: jspb.Message.getFieldWithDefault(msg, 6, "")
   };
 
   if (includeInstance) {
@@ -1210,6 +1259,10 @@ proto.chatbothub.LoginBotRequest.deserializeBinaryFromReader = function(msg, rea
       msg.setPassword(value);
       break;
     case 5:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setNotifyurl(value);
+      break;
+    case 6:
       var value = /** @type {string} */ (reader.readString());
       msg.setLogininfo(value);
       break;
@@ -1270,10 +1323,17 @@ proto.chatbothub.LoginBotRequest.serializeBinaryToWriter = function(message, wri
       f
     );
   }
-  f = message.getLogininfo();
+  f = message.getNotifyurl();
   if (f.length > 0) {
     writer.writeString(
       5,
+      f
+    );
+  }
+  f = message.getLogininfo();
+  if (f.length > 0) {
+    writer.writeString(
+      6,
       f
     );
   }
@@ -1341,17 +1401,32 @@ proto.chatbothub.LoginBotRequest.prototype.setPassword = function(value) {
 
 
 /**
- * optional string loginInfo = 5;
+ * optional string notifyUrl = 5;
  * @return {string}
  */
-proto.chatbothub.LoginBotRequest.prototype.getLogininfo = function() {
+proto.chatbothub.LoginBotRequest.prototype.getNotifyurl = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
 };
 
 
 /** @param {string} value */
-proto.chatbothub.LoginBotRequest.prototype.setLogininfo = function(value) {
+proto.chatbothub.LoginBotRequest.prototype.setNotifyurl = function(value) {
   jspb.Message.setField(this, 5, value);
+};
+
+
+/**
+ * optional string loginInfo = 6;
+ * @return {string}
+ */
+proto.chatbothub.LoginBotRequest.prototype.getLogininfo = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 6, ""));
+};
+
+
+/** @param {string} value */
+proto.chatbothub.LoginBotRequest.prototype.setLogininfo = function(value) {
+  jspb.Message.setField(this, 6, value);
 };
 
 
