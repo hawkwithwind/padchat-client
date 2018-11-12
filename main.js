@@ -54,7 +54,7 @@ var botClient = {
   wxbot: undefined,
   tunnel: undefined,
   logindone: function(data) {
-    callback({eventType:'LOGINDONE', body: {
+    this.callback({eventType:'LOGINDONE', body: {
       userName: this.loginData.userName,
       wxData: this.deviceData.wxData,
       token: this.deviceData.token,
