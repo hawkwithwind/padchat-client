@@ -60,6 +60,15 @@ var botClient = {
       token: this.loginInfo.token,
     }})
   },
+
+  actionreply: function(eventType, body, result) {
+    this.callback({eventType: 'ACTIONREPLY',
+		   body: {
+		     eventType: eventType,
+		     body: body,
+		     result: result }
+		  })
+  }
   
   callback: function(data) {
     if (this.tunnel === undefined) {
@@ -121,15 +130,50 @@ async function runEventTunnel(bot) {
 
     if (eventType == 'PONG') {
       //log.info("PONG " + clientType + " " + clientid);
-    } else if (eventType == 'LOGIN') {
-      log.info("LOGIN CMD");
+    } else {
       if (botClient.tunnel === undefined) {
 	log.error('grpc botClient.tunnel undefined')
+	return
       }
+
+      log.info("CMD ", eventType);
       
-      bot.handleLoginRequest(body);
-    } else {
-      log.info("unhandled message " + stringify(eventReply));
+      if (eventType == 'LOGIN') {	
+	bot.handleLoginRequest(body);
+      } else if (eventType == 'BOTACTION') {
+	if (bot.wxbot === undefined) {
+	  bot.actionreply(eventType, body, {success: false, msg: "bot instance is gone away"})
+	  return	  
+	}
+
+	let actionBody = JSON.parse(body)
+	let actionType = actionBody.actionType
+
+	if (actionType === undefined || actionBody.body === undefined) {
+	  log.error("actionBody empty", body)
+	  return
+	}
+	
+	if (actionType == "SendTextMessage") {
+	  sendBody = JSON.parse(actionBody.body)
+
+	  toUserName = sendBody.toUserName
+	  content = sendBody.content
+	  atList = sendBody.atList
+	  if (toUserName === undefined || content === undefined || atList === undefined) {
+	    log.error("send text message empty", actionBody.body)
+	    return
+	  }
+	
+	  let ret = await bot.wxbot.sendMessage(toUserName, content, atList)
+	  bot.actionreply(eventType, sendBody, ret)
+	  
+	} else {
+	  log.error("unsupported action", actionType)
+	}	
+      } else {
+	log.info("unhandled message " + stringify(eventReply));
+      }
     }
   });
 

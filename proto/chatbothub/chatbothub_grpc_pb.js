@@ -19,6 +19,50 @@
 var grpc = require('grpc');
 var chatbothub_pb = require('./chatbothub_pb.js');
 
+function serialize_chatbothub_BotActionReply(arg) {
+  if (!(arg instanceof chatbothub_pb.BotActionReply)) {
+    throw new Error('Expected argument of type chatbothub.BotActionReply');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_chatbothub_BotActionReply(buffer_arg) {
+  return chatbothub_pb.BotActionReply.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_chatbothub_BotActionRequest(arg) {
+  if (!(arg instanceof chatbothub_pb.BotActionRequest)) {
+    throw new Error('Expected argument of type chatbothub.BotActionRequest');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_chatbothub_BotActionRequest(buffer_arg) {
+  return chatbothub_pb.BotActionRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_chatbothub_BotLoginReply(arg) {
+  if (!(arg instanceof chatbothub_pb.BotLoginReply)) {
+    throw new Error('Expected argument of type chatbothub.BotLoginReply');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_chatbothub_BotLoginReply(buffer_arg) {
+  return chatbothub_pb.BotLoginReply.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_chatbothub_BotLoginRequest(arg) {
+  if (!(arg instanceof chatbothub_pb.BotLoginRequest)) {
+    throw new Error('Expected argument of type chatbothub.BotLoginRequest');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_chatbothub_BotLoginRequest(buffer_arg) {
+  return chatbothub_pb.BotLoginRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_chatbothub_BotsReply(arg) {
   if (!(arg instanceof chatbothub_pb.BotsReply)) {
     throw new Error('Expected argument of type chatbothub.BotsReply');
@@ -63,28 +107,6 @@ function deserialize_chatbothub_EventRequest(buffer_arg) {
   return chatbothub_pb.EventRequest.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
-function serialize_chatbothub_LoginBotReply(arg) {
-  if (!(arg instanceof chatbothub_pb.LoginBotReply)) {
-    throw new Error('Expected argument of type chatbothub.LoginBotReply');
-  }
-  return new Buffer(arg.serializeBinary());
-}
-
-function deserialize_chatbothub_LoginBotReply(buffer_arg) {
-  return chatbothub_pb.LoginBotReply.deserializeBinary(new Uint8Array(buffer_arg));
-}
-
-function serialize_chatbothub_LoginBotRequest(arg) {
-  if (!(arg instanceof chatbothub_pb.LoginBotRequest)) {
-    throw new Error('Expected argument of type chatbothub.LoginBotRequest');
-  }
-  return new Buffer(arg.serializeBinary());
-}
-
-function deserialize_chatbothub_LoginBotRequest(buffer_arg) {
-  return chatbothub_pb.LoginBotRequest.deserializeBinary(new Uint8Array(buffer_arg));
-}
-
 
 var ChatBotHubService = exports.ChatBotHubService = {
   // bots only use eventtunnel to communicate
@@ -111,16 +133,27 @@ var ChatBotHubService = exports.ChatBotHubService = {
     responseSerialize: serialize_chatbothub_BotsReply,
     responseDeserialize: deserialize_chatbothub_BotsReply,
   },
-  loginBot: {
-    path: '/chatbothub.ChatBotHub/LoginBot',
+  botLogin: {
+    path: '/chatbothub.ChatBotHub/BotLogin',
     requestStream: false,
     responseStream: false,
-    requestType: chatbothub_pb.LoginBotRequest,
-    responseType: chatbothub_pb.LoginBotReply,
-    requestSerialize: serialize_chatbothub_LoginBotRequest,
-    requestDeserialize: deserialize_chatbothub_LoginBotRequest,
-    responseSerialize: serialize_chatbothub_LoginBotReply,
-    responseDeserialize: deserialize_chatbothub_LoginBotReply,
+    requestType: chatbothub_pb.BotLoginRequest,
+    responseType: chatbothub_pb.BotLoginReply,
+    requestSerialize: serialize_chatbothub_BotLoginRequest,
+    requestDeserialize: deserialize_chatbothub_BotLoginRequest,
+    responseSerialize: serialize_chatbothub_BotLoginReply,
+    responseDeserialize: deserialize_chatbothub_BotLoginReply,
+  },
+  botAction: {
+    path: '/chatbothub.ChatBotHub/BotAction',
+    requestStream: false,
+    responseStream: false,
+    requestType: chatbothub_pb.BotActionRequest,
+    responseType: chatbothub_pb.BotActionReply,
+    requestSerialize: serialize_chatbothub_BotActionRequest,
+    requestDeserialize: deserialize_chatbothub_BotActionRequest,
+    responseSerialize: serialize_chatbothub_BotActionReply,
+    responseDeserialize: deserialize_chatbothub_BotActionReply,
   },
 };
 
