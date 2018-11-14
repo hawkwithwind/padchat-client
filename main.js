@@ -73,7 +73,7 @@ var botClient = {
       return
     }
 
-    this.tunnel.write(newEventRequest(data.eventType, JSON.stringify(data.body)))
+    this.tunnel.write(newEventRequest(data.eventType, stringify(data.body)))
   },
   
   handleLoginRequest: function(body) {
