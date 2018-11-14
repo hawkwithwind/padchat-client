@@ -122,7 +122,7 @@ async function runEventTunnel(bot) {
   log.info("begin grpc connection");
   botClient.flag = true;
   botClient.tunnel = client.eventTunnel();
-  botClient.tunnel.on('data', function(eventReply) {
+  botClient.tunnel.on('data', aysnc function(eventReply) {
     var eventType = eventReply.getEventtype()
     var body = eventReply.getBody()
     var clientid = eventReply.getClientid()
