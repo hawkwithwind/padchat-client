@@ -413,7 +413,7 @@ module.exports = (config, botClient) => {
 
       case 37:
 	logger.info('收到好友请求', data)
-	botClient.callback({eventType:'FREINDREQUEST', body:data})
+	botClient.callback({eventType:'FRIENDREQUEST', body:data})
 	break
 
       case 10002:
