@@ -68,7 +68,7 @@ var botClient = {
 		     body: body,
 		     result: result }
 		  })
-  }
+  },
   
   callback: function(data) {
     if (this.tunnel === undefined) {
