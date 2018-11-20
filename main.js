@@ -117,7 +117,6 @@ var botClient = {
 }
 
 //router.botClient = botClient;
-
 router.text(/.*/, async (msg, wx) => {
   botClient.callback({eventType: 'MESSAGE', body: stringify(msg)})
 })
@@ -160,6 +159,8 @@ async function runEventTunnel(bot) {
 	
 	if (actionType == "SendTextMessage") {
 	  sendBody = JSON.parse(actionBody.body)
+
+	  log.info("sendBody", sendBody)
 
 	  toUserName = sendBody.toUserName
 	  content = sendBody.content
