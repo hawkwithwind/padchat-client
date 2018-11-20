@@ -170,7 +170,7 @@ async function runEventTunnel(bot) {
 	    return
 	  }
 	
-	  let ret = await bot.wxbot.sendMessage(toUserName, content, atList)
+	  let ret = await bot.wxbot.sendMsg(toUserName, content, atList)
 	  bot.actionreply(eventType, sendBody, ret)
 	  
 	} else {
