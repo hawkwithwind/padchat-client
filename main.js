@@ -143,6 +143,8 @@ async function runEventTunnel(bot) {
       
       if (eventType == 'LOGIN') {	
 	bot.handleLoginRequest(body);
+      } else if (eventType == 'LOGOUT') {
+	let ret = await bot.wxbot.logout()
       } else if (eventType == 'BOTACTION') {
 	if (bot.wxbot === undefined) {
 	  bot.actionreply(eventType, body, {success: false, msg: "bot instance is gone away"})
@@ -157,25 +159,134 @@ async function runEventTunnel(bot) {
 	  return
 	}
 	
+	var ret
+	var bodym = JSON.parse(actionBody.body)
+	
 	if (actionType == "SendTextMessage") {
-	  sendBody = JSON.parse(actionBody.body)
-
-	  log.info("sendBody", sendBody)
-
-	  toUserName = sendBody.toUserName
-	  content = sendBody.content
-	  atList = sendBody.atList
+	  toUserName = bodym.toUserName
+	  content = bodym.content
+	  atList = bodym.atList
 	  if (toUserName === undefined || content === undefined || atList === undefined) {
-	    log.error("send text message empty", actionBody.body)
+	    log.error("send text message empty")
 	    return
 	  }
 	
-	  let ret = await bot.wxbot.sendMsg(toUserName, content, atList)
-	  bot.actionreply(eventType, sendBody, ret)
+	  ret = await bot.wxbot.sendMsg(toUserName, content, atList)
+	} else if (actionType == "AcceptUser") {
+	  stranger = bodym.stranger
+	  ticket = bodym.ticket
+	  if (stranger === undefined || ticket === undefined ) {
+	    log.error("accept user message empty")
+	    return
+	  }
+	  ret = await bot.wxbot.acceptUser(stranger, ticket)
+	} else if (actionType == "AddContact") {
+	  stranger = bodym.stranger
+	  ticket = bodym.ticket
+	  type = bodym.type
+	  content = bodym.content
+	  if (stranger === undefined || ticket === undefined || type === undefined) {
+	    log.error("add contact message empty")
+	    return
+	  }
 	  
+	  if (content === undefined) {
+	    ret = await bot.wxbot.addContact(stranger, ticket, type)
+	  } else {
+	    ret = await bot.wxbot.addContact(stranger, ticket, type, content)
+	  }
+	} else if (actionType == "SayHello") {
+	  stranger = bodym.stranger
+	  ticket = bodym.ticket
+	  content = bodym.content
+	  if (stranger === undefined || ticket === undefined || content === undefined) {
+	    log.error("say hello message empty")
+	    return
+	  }
+	  ret = await bot.wxbot.SayHello(stranger, ticket, content)
+	} else if (actionType == "GetContact") {
+	  userId = bodym.userId
+	  if (userId === undefined) {
+	    log.error("get contact message empty")
+	    return
+	  }
+	  ret = await bot.wxbot.getContact(userId)
+	} else if (actionType == "CreateRoom") {
+	  userList = bodym.userList
+	  if (userList === undefined) {
+	    log.error("create room message empty")
+	    return
+	  }
+	  ret = await bot.wxbot.createRoom(userList)
+	} else if (actionType == "GetRoomMembers") {
+	  groupId = bodym.groupId
+	  if (groupId === undefined) {
+	    log.error("get room members message empty")
+	    return
+	  }
+	  ret = await bot.wxbot.getRoomMembers(groupId)
+	} else if (actionType == "GetRoomQRCode") {
+	  groupId = bodym.groupId
+	  if (groupId === undefined) {
+	    log.error("get room QRCode message empty")
+	    return
+	  }
+	  ret = await bot.wxbot.getRoomQrcode(groupId)
+	} else if (actionType == "AddRoomMember") {
+	  groupId = bodym.groupId
+	  userId = bodym.userId
+	  if (groupId === undefined || userId === undefined ) {
+	    log.error("add room member message empty")
+	    return
+	  }
+	  ret = await bot.wxbot.addRoomMember(groupId, userId)
+	} else if (actionType == "InviteRoomMember") {
+	  groupId = bodym.groupId
+	  userId = bodym.userId
+	  if (groupId === undefined || userId === undefined ) {
+	    log.error("invite room member message empty")
+	    return
+	  }
+	  ret = await bot.wxbot.inviteRoomMember(groupId, userId)
+	} else if (actionType == "DeleteRoomMember") {
+	  groupId = bodym.groupId
+	  userId = bodym.userId
+	  if (groupId === undefined || userId === undefined ) {
+	    log.error("delete room member message empty")
+	    return
+	  }
+	  ret = await bot.wxbot.deleteRoomMember(groupId, userId)
+	} else if (actionType == "SetRoomAnnouncement") {
+	  groupId = bodym.groupId
+	  content = bodym.content
+	  if (groupId === undefined || userId === undefined ) {
+	    log.error("set room announcement message empty")
+	    return
+	  }
+	  ret = await bot.wxbot.setRoomAnnouncement(groupId, content)
+	} else if (actionType == "SetRoomName") {
+	  groupId = bodym.groupId
+	  content = bodym.content
+	  if (groupId === undefined || userId === undefined ) {
+	    log.error("set room name message empty")
+	    return
+	  }
+	  ret = await bot.wxbot.setRoomName(groupId, content)	
+	} else if (actionType == "GetContantQRCode") {
+	  userId = bodym.userId
+	  style = bodym.style
+	  if (userId === undefined || style === undefined) {
+	    log.error("get contact qrcode message empty")
+	    return
+	  }
+	  ret = await bot.wxbot.getContactQrcode(userId, style)
 	} else {
 	  log.error("unsupported action", actionType)
-	}	
+	}
+
+	if (ret !== undefined) {
+	  bot.actionreply(eventType, actionBody, ret)
+	}
       } else {
 	log.info("unhandled message " + stringify(eventReply));
       }
