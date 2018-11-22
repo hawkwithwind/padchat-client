@@ -77,8 +77,11 @@ var botClient = {
       log.error('grpc connection not established while receiving wxlogin callback, exit.')
       return
     }
+
+    if(data.eventType != "LOGINDONE") {    
+      log.info('wxbot callback ' +  stringify(data))
+    }
     
-    log.info('wxbot callback ' +  stringify(data))
     if (data === undefined || data.eventType === undefined) {
       log.error('wxcallback data.eventType undefined')
       return
