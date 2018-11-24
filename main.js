@@ -124,6 +124,10 @@ router.text(/.*/, async (msg, wx) => {
   botClient.callback({eventType: 'MESSAGE', body: stringify(msg)})
 })
 
+router.link(/.*/, async (msg, wx) => {
+  botClient.callback({eventType: 'APPMESSAGE', body: stringify(msg)})
+})
+
 async function runEventTunnel(bot) {
   log.info("begin grpc connection");
   botClient.flag = true;

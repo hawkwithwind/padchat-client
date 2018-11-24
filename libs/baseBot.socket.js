@@ -223,6 +223,7 @@ module.exports = (config, botClient) => {
     })
     .on('over', ({ msg }) => {
       logger.info('任务实例已关闭！', msg)
+      botClient.callback({eventType:'LOGOUTDONE', body:msg})
     })
     .on('loaded', async () => {
       logger.info('通讯录同步完毕！')
