@@ -456,7 +456,7 @@ module.exports = (config, botClient) => {
       logger.warn('获取设备参数未成功！ json:', ret)
       return
     }
-    logger.info('获取设备参数成功, json: ', ret)
+    //logger.info('获取设备参数成功, json: ', ret)
     Object.assign(autoData, { wxData: ret.data.wxData })
 
     ret = await wx.getLoginToken()
@@ -464,7 +464,7 @@ module.exports = (config, botClient) => {
       logger.warn('获取自动登陆数据未成功！ json:', ret)
       return
     }
-    logger.info('获取自动登陆数据成功, json: ', ret)
+    //logger.info('获取自动登陆数据成功, json: ', ret)
     Object.assign(autoData, { token: ret.data.token })
     Object.assign(autoData, { userName: botClient.loginData.userName })
 

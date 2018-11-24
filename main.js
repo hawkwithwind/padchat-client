@@ -125,7 +125,7 @@ router.text(/.*/, async (msg, wx) => {
 })
 
 router.link(/.*/, async (msg, wx) => {
-  botClient.callback({eventType: 'APPMESSAGE', body: stringify(msg)})
+  botClient.callback({eventType: 'MESSAGE', body: stringify(msg)})
 })
 
 async function runEventTunnel(bot) {
