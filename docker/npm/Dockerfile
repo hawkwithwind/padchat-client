@@ -1,5 +1,8 @@
 FROM node:8-slim
-RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list
+ARG mirror=mirrors.ustc.edu.cn
+ADD modifysource.sh /home/scripts/modifysource.sh
+RUN /bin/bash /home/scripts/modifysource.sh $mirror
+RUN cat /etc/apt/sources.list
 RUN apt-get update
 
 ENV TZ=Asia/Shanghai
@@ -18,7 +21,7 @@ RUN apt-get install -y locales && \
 ENV LANG="zh_CN.UTF-8"
 RUN locale -a
 
-RUN npm config set registry=http://registry.npm.taobao.org
+RUN npm config set registry=http://registry.npm.taobao.org -g
 
 USER node
 
