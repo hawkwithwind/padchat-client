@@ -93,6 +93,8 @@ module.exports = (config, botClient) => {
 	  botClient.loginInfo.wxData.length > 0 &&
 	  botClient.loginInfo.token!==undefined &&
 	  botClient.loginInfo.token.length > 0 ) {
+
+	logger.info(botClient.loginInfo)
 	
 	ret = await wx.login('auto', botClient.loginInfo)
 	if (ret.success) {
