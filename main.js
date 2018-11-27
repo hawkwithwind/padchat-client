@@ -220,6 +220,7 @@ async function runEventTunnel(bot) {
 	  ret = await bot.wxbot.getContact(userId)
 	} else if (actionType == "CreateRoom") {
 	  userList = bodym.userList
+	  log.info("create room userlist %o", userList)
 	  if (userList === undefined) {
 	    log.error("create room message empty")
 	    return

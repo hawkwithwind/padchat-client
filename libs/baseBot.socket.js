@@ -213,6 +213,7 @@ module.exports = (config, botClient) => {
     })
     .on('autoLogin', async () => {
       // 自动重连后需要保存新的自动登陆数据
+      logger.info('update token')
       await saveAutoData(botClient)
       botClient.callback({eventType:'UPDATETOKEN', body:{
 	userName: botClient.loginData.userName,
