@@ -168,6 +168,7 @@ async function runEventTunnel(bot) {
 	
 	var ret
 	var bodym = JSON.parse(actionBody.body)
+	log.info("actionBody %o", actionBody)
 	
 	if (actionType == "SendTextMessage") {
 	  toUserName = bodym.toUserName
