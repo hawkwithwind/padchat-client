@@ -51,7 +51,6 @@ var botClient = {
   loginData: undefined,
   loginPass: undefined,
   loginInfo: undefined,
-  notifyUrl: undefined,
   botId: undefined,
   wxbot: undefined,
   tunnel: undefined,
@@ -60,7 +59,6 @@ var botClient = {
       userName: this.loginData.userName,
       wxData: this.loginInfo.wxData,
       token: this.loginInfo.token,
-      notifyUrl: this.notifyUrl,
       botId: this.botId,
     }})
   },
@@ -106,8 +104,7 @@ var botClient = {
     } else {
       log.info('begin login')
       let loginbody = JSON.parse(body)
-      this.loginPass = {login: loginbody.login, password: loginbody.password}
-      this.notifyUrl = loginbody.notifyUrl
+      this.loginPass = {login: loginbody.login, password: loginbody.password}      
       this.botId = loginbody.botId
       
       if (loginbody.loginInfo.length > 0) {
