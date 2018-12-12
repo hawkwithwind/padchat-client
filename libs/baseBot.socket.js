@@ -5,6 +5,7 @@ const Padchat = require('padchat-sdk')
 const fs      = require('fs')
 const util    = require('util')
 const qrcode  = require('qrcode-terminal')
+const image2base64 = require('image-to-base64')
 
 /**
 * 创建日志目录
@@ -138,8 +139,12 @@ module.exports = (config, botClient) => {
       // 如果存在url，则直接在终端中生成二维码并显示
       if (data.url) {
 	logger.info(`登陆二维码内容为: "${data.url}"，请使用微信扫描下方二维码登陆!`)
-	qrcode.generate(data.url, { small: false })
-	botClient.callback({eventType:'LOGINSCAN', body: {url: data.url}})
+	qr = await image2base64(data.url)
+	botClient.callback({eventType:'LOGINSCAN', body:{url: qr}})
+	
+	// qrcode.generate(data.url, { small: false } ,function(qr) {
+	//   botClient.callback({eventType:'LOGINSCAN', body: {url: data.url, data: qr}})
+	// })
       } else {
 	logger.error(`未能获得登陆二维码`)
       }
