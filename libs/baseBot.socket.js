@@ -135,12 +135,12 @@ module.exports = (config, botClient) => {
       }
       logger.info('使用qrcode登录模式！')
     })
-    .on('qrcode', data => {
+    .on('qrcode', async (data) => {
       // 如果存在url，则直接在终端中生成二维码并显示
       if (data.url) {
 	logger.info(`登陆二维码内容为: "${data.url}"，请使用微信扫描下方二维码登陆!`)
-	qr = await image2base64(data.url)
-	botClient.callback({eventType:'LOGINSCAN', body:{url: qr}})
+	let qr = await image2base64(data.url)
+	botClient.callback({eventType:'LOGINSCAN', body:{url: `data:image/png;base64,${qr}`}})
 	
 	// qrcode.generate(data.url, { small: false } ,function(qr) {
 	//   botClient.callback({eventType:'LOGINSCAN', body: {url: data.url, data: qr}})
