@@ -6,6 +6,7 @@ const fs      = require('fs')
 const util    = require('util')
 const qrcode  = require('qrcode-terminal')
 const image2base64 = require('image-to-base64')
+const x2j     = require('xml2js')
 
 /**
 * 创建日志目录
@@ -25,6 +26,20 @@ try {
 } catch (e) {
   console.error('载入log4js日志输出配置错误: ', e)
   process.exit(1);
+}
+
+let parseXml = async (xml) => {
+  return new Promise((resolve, reject) => {
+    x2j.parseString(xml, {
+      explicitArray: false
+    }, (error, result) => {
+      if (error) {
+        reject(error)
+      } else {
+        resolve(result)
+      }
+    })
+  })
 }
 
 const logger = log4js.getLogger('app')
@@ -279,6 +294,7 @@ module.exports = (config, botClient) => {
       switch (data.mType) {
       case 3:
         logger.info('收到来自 %s 的图片消息，包含图片数据：%s，xml内容：\n%s', data.fromUser, !!data.data, data.content)
+	
         rawFile = data.data || null
         logger.info('图片缩略图数据base64尺寸：%d', rawFile.length)
         await wx.getMsgImage(data)
@@ -287,6 +303,15 @@ module.exports = (config, botClient) => {
             logger.info('获取消息原始图片结果：%s, 获得图片base64尺寸：%d', ret.success, rawFile.length)
           })
         logger.info('图片数据base64尺寸：%d', rawFile.length)
+
+	if(data.content && data.fromUser) {
+	  if (/@chatroom$/.test(data.fromUser)) {
+	    data['groupId'] = data.fromUser
+	    data['fromUser'] = data.content.substr(0, data.content.indexOf(':\n'))
+	    data['content'] = data.content.substr(data.content.indexOf(':\n') + 2)
+	  }
+	}
+	
 	/*
           await wx.sendImage('filehelper', rawFile)
           .then(ret => {
