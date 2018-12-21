@@ -198,7 +198,7 @@ async function runEventTunnel(bot) {
 	    log.error("send image message empty")
 	    return
 	  }
-	  ret = await bot.wxbot.sendImage(toUsreName, rawFile)
+	  ret = await bot.wxbot.sendImage(toUserName, rawFile)
 	} else if (actionType == "AcceptUser") {
 	  stranger = bodym.stranger
 	  ticket = bodym.ticket
