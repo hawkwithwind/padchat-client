@@ -195,7 +195,7 @@ async function runEventTunnel(bot) {
 	    return
 	  }
 	  ret = await bot.wxbot.sendAppMsg(toUserName, object)
-	} else if (actionType == "SendImageMessage") {
+	} else if (actionType == "SendImageResourceMessage") {
 	  let toUserName = bodym.toUserName
 	  let imageId = bodym.imageId
 	  if (toUserName === undefined || imageId === undefined) {
