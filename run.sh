@@ -9,5 +9,6 @@ docker run -d --rm --net=host --name $1 \
        -v `pwd`/main.js:/home/work/main.js \
        -v `pwd`/$1/config:/home/work/config \
        -v `pwd`/$1/logs:/home/work/logs \
+       -v `pwd`/$1/cache:/home/work/cache \
        -w /home/work padchat-client
 
