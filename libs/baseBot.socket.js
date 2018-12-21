@@ -304,6 +304,8 @@ module.exports = (config, botClient) => {
       switch (data.mType) {
       case 3:
         logger.info('收到来自 %s 的图片消息，包含图片数据：%s，xml内容：\n%s', data.fromUser, !!data.data, data.content)
+	logger.info(data)
+	logger.info('=======')
 	
         rawFile = data.data || null
         logger.info('图片缩略图数据base64尺寸：%d', rawFile.length)
