@@ -7,6 +7,7 @@ const util    = require('util')
 const qrcode  = require('qrcode-terminal')
 const image2base64 = require('image-to-base64')
 const x2j     = require('xml2js')
+const uuidv4  = require('uuid/v4')
 
 /**
 * 创建日志目录
@@ -19,6 +20,15 @@ try {
     console.error('Could not set up log directory, error: ', e)
     process.exit(1)
   }
+}
+
+try {
+  require('fs').mkdirSync('./cache')  
+} catch(e) {
+  if (e.code !== 'EEXIST') {
+    console.error('Could not set up cache directory, error: ', e)
+    process.exit(1)
+  }  
 }
 
 try {
@@ -322,7 +332,11 @@ module.exports = (config, botClient) => {
           })
 	*/
 
-	data.rawFile = rawFile
+	let imageId = botClient.loginData.userName + "-" + uuidv4()
+	data.imageId = imageId
+	fs.writeFileSync(`cache/${imageId}`, rawFile)
+	logger.info('写入图片文件 ' + `cache/${imageId}`)
+	
 	botClient.callback({eventType:'IMAGEMESSAGE', body: data})
         break
 

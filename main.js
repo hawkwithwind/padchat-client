@@ -178,45 +178,46 @@ async function runEventTunnel(bot) {
 	}
 	
 	if (actionType == "SendTextMessage") {
-	  toUserName = bodym.toUserName
-	  content = bodym.content
-	  atList = bodym.atList
+	  let toUserName = bodym.toUserName
+	  let content = bodym.content
+	  let atList = bodym.atList
 	  if (toUserName === undefined || content === undefined || atList === undefined) {
 	    log.error("send text message empty")
 	    return
 	  }
 	
 	  ret = await bot.wxbot.sendMsg(toUserName, content, atList)
-
 	} else if (actionType == "SendAppMessage") {
-	  toUserName = bodym.toUserName
-	  object = bodym.object
+	  let toUserName = bodym.toUserName
+	  let object = bodym.object
 	  if (toUserName === undefined || object === undefined) {
 	    log.error("send app message empty")
 	    return
 	  }
 	  ret = await bot.wxbot.sendAppMsg(toUserName, object)
 	} else if (actionType == "SendImageMessage") {
-	  toUserName = bodym.toUserName
-	  rawFile = bodym.rawFile
-	  if (toUserName === undefined || rawFile === undefined) {
+	  let toUserName = bodym.toUserName
+	  let imageId = bodym.imageId
+	  if (toUserName === undefined || imageId === undefined) {
 	    log.error("send image message empty")
 	    return
 	  }
+
+	  let rawFile = fs.readFileSync(`cache/${imageId}`)
 	  ret = await bot.wxbot.sendImage(toUserName, rawFile)
 	} else if (actionType == "AcceptUser") {
-	  stranger = bodym.stranger
-	  ticket = bodym.ticket
+	  let stranger = bodym.stranger
+	  let ticket = bodym.ticket
 	  if (stranger === undefined || ticket === undefined ) {
 	    log.error("accept user message empty")
 	    return
 	  }
 	  ret = await bot.wxbot.acceptUser(stranger, ticket)
 	} else if (actionType == "AddContact") {
-	  stranger = bodym.stranger
-	  ticket = bodym.ticket
-	  type = bodym.type
-	  content = bodym.content
+	  let stranger = bodym.stranger
+	  let ticket = bodym.ticket
+	  let type = bodym.type
+	  let content = bodym.content
 	  if (stranger === undefined || ticket === undefined || type === undefined) {
 	    log.error("add contact message empty")
 	    return
