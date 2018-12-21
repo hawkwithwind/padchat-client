@@ -203,7 +203,7 @@ async function runEventTunnel(bot) {
 	    return
 	  }
 
-	  let rawFile = fs.readFileSync(`cache/${imageId}`)
+	  let rawFile = String(fs.readFileSync(`cache/${imageId}`))
 	  ret = await bot.wxbot.sendImage(toUserName, rawFile)
 	  log.info("send file %d returned %o", rawFile.length, ret)
 	  log.info(rawFile.substr(0, 80))
