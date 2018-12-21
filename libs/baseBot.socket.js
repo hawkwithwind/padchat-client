@@ -23,7 +23,7 @@ try {
 }
 
 try {
-  require('fs').mkdirSync('./cache')  
+  require('fs').mkdirSync('./cache')
 } catch(e) {
   if (e.code !== 'EEXIST') {
     console.error('Could not set up cache directory, error: ', e)
