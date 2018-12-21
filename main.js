@@ -79,7 +79,7 @@ var botClient = {
     }
 
     if(data.eventType != "LOGINDONE" && data.eventType != "IMAGEMESSAGE" && data.eventType != "ACTIONREPLY") {
-      log.info('wxbot callback ' +  stringify(data).substring(0, 120))
+      log.info('wxbot callback ' +  stringify(data).substr(0, 120))
     } else {
       log.info('wxbot callback ' + data.eventType)
     }
@@ -206,7 +206,7 @@ async function runEventTunnel(bot) {
 	  let rawFile = fs.readFileSync(`cache/${imageId}`)
 	  ret = await bot.wxbot.sendImage(toUserName, rawFile)
 	  log.info("send file %d returned %o", rawFile.length, ret)
-	  log.info(rawFile.substring(0, 80))
+	  log.info(rawFile.substr(0, 80))
 	} else if (actionType == "AcceptUser") {
 	  let stranger = bodym.stranger
 	  let ticket = bodym.ticket

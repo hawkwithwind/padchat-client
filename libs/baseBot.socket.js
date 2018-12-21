@@ -304,16 +304,11 @@ module.exports = (config, botClient) => {
       switch (data.mType) {
       case 3:
         logger.info('收到来自 %s 的图片消息，包含图片数据：%s，xml内容：\n%s', data.fromUser, !!data.data, data.content)
-	logger.info(data)
-	logger.info('=======')
-	
         rawFile = data.data || null
         logger.info('图片缩略图数据base64尺寸：%d', rawFile.length)
         await wx.getMsgImage(data)
           .then(ret => {
-	    logger.info(data)	    
-	    logger.info(ret)
-	    
+	    logger.info("%d %s", ret.status, ret.message)
             rawFile = ret.data.image || ''
             logger.info('获取消息原始图片结果：%s, 获得图片base64尺寸：%d', ret.success, rawFile.length)
           })
@@ -342,7 +337,7 @@ module.exports = (config, botClient) => {
 	fs.writeFileSync(`cache/${imageId}`, rawFile)
 	logger.info('写入图片文件 ' + `cache/${imageId}`)
 	logger.info('rawFile %d', rawFile.length)
-	logger.info(rawFile.substring(0, 80))
+	logger.info(rawFile.substr(0, 80))
 	
 	botClient.callback({eventType:'IMAGEMESSAGE', body: data})
         break
