@@ -336,6 +336,8 @@ module.exports = (config, botClient) => {
 	data.imageId = imageId
 	fs.writeFileSync(`cache/${imageId}`, rawFile)
 	logger.info('写入图片文件 ' + `cache/${imageId}`)
+	logger.info('rawFile %d', rawFile.length)
+	logger.info(rawFile.substring(0, 80))
 	
 	botClient.callback({eventType:'IMAGEMESSAGE', body: data})
         break

@@ -205,6 +205,8 @@ async function runEventTunnel(bot) {
 
 	  let rawFile = fs.readFileSync(`cache/${imageId}`)
 	  ret = await bot.wxbot.sendImage(toUserName, rawFile)
+	  log.info("send file %d returned %o", rawFile.length, ret)
+	  log.info(rawFile.substring(0, 80))
 	} else if (actionType == "AcceptUser") {
 	  let stranger = bodym.stranger
 	  let ticket = bodym.ticket
