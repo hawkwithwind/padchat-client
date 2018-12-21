@@ -309,6 +309,7 @@ module.exports = (config, botClient) => {
         logger.info('图片缩略图数据base64尺寸：%d', rawFile.length)
         await wx.getMsgImage(data)
           .then(ret => {
+	    logger.info(data)	    
 	    logger.info(ret)
 	    
             rawFile = ret.data.image || ''
