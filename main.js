@@ -78,8 +78,10 @@ var botClient = {
       return
     }
 
-    if(data.eventType != "LOGINDONE") {    
+    if(data.eventType != "LOGINDONE" && data.eventType != "IMAGEMESSAGE") {
       log.info('wxbot callback ' +  stringify(data))
+    } else {
+      log.info('wxbot callback ' + data.eventType)
     }
     
     if (data === undefined || data.eventType === undefined) {
