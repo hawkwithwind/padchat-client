@@ -180,6 +180,17 @@ async function runEventTunnel(bot) {
 	  }
 	
 	  ret = await bot.wxbot.sendMsg(toUserName, content, atList)
+
+	} else if (actionType == "SendAppMessage") {
+	  toUserName = bodym.toUserName
+	  object = bodym.object
+	  if (toUserName === undefined || object === undefined) {
+	    log.error("send app message empty")
+	    return
+	  }
+
+	  ret = await bot.wxbot.sendAppMsg(toUserName, object)
+	  
 	} else if (actionType == "AcceptUser") {
 	  stranger = bodym.stranger
 	  ticket = bodym.ticket
