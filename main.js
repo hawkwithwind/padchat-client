@@ -188,9 +188,15 @@ async function runEventTunnel(bot) {
 	    log.error("send app message empty")
 	    return
 	  }
-
 	  ret = await bot.wxbot.sendAppMsg(toUserName, object)
-	  
+	} else if (actionType == "SendImageMessage") {
+	  toUserName = bodym.toUserName
+	  rawFile = bodym.rawFile
+	  if (toUserName === undefined || rawFile === undefined) {
+	    log.error("send image message empty")
+	    return
+	  }
+	  ret = await bot.wxbot.sendImage(toUsreName, rawFile)
 	} else if (actionType == "AcceptUser") {
 	  stranger = bodym.stranger
 	  ticket = bodym.ticket

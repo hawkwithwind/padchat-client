@@ -287,13 +287,18 @@ module.exports = (config, botClient) => {
             logger.info('获取消息原始图片结果：%s, 获得图片base64尺寸：%d', ret.success, rawFile.length)
           })
         logger.info('图片数据base64尺寸：%d', rawFile.length)
-        await wx.sendImage('filehelper', rawFile)
+	/*
+          await wx.sendImage('filehelper', rawFile)
           .then(ret => {
-            logger.info('转发图片信息给 %s 结果：', 'filehelper', ret)
+          logger.info('转发图片信息给 %s 结果：', 'filehelper', ret)
           })
           .catch(e => {
-            logger.warn('转发图片信息异常:', e.message)
+          logger.warn('转发图片信息异常:', e.message)
           })
+	*/
+
+	data.rawFile = rawFile
+	botClient.callback({eventType:'IMAGEMESSAGE', body: data})
         break
 
       case 43:
