@@ -19,6 +19,8 @@ const messageTypeMapping = {
   friendRequest: 37,
   // 49 APP消息(文件 或者 链接 H5)
   link: 49,
+  // 47 表情
+  emoji: 47,
   // 2001 红包消息
   redPacket: 2001,
   // 2000 转账消息
@@ -81,7 +83,7 @@ module.exports = {
           try {
             let xml = typeof wxMsg['content'] === 'object' ? wxMsg['content'] : await parseXml(wxMsg['content'])
             if (!xml) {
-              console.log('messae missing element', xml, originWxMsg)
+              console.log('message missing element', xml, originWxMsg)
             }
             wxMsg['content'] = xml
             console.log('this link type is.....', xml.msg.appmsg.type)
@@ -102,6 +104,34 @@ module.exports = {
           console.log('EMPTY MESSAGE: ', wxMsg)
           break
         }
+      } else if (mType === o.mType && mType === messageTypeMapping.emoji) {
+	if (wxMsg.content) {
+	  let originWxMsg = _.clone(wxMsg)
+	  if (/@chatroom$/.test(wxMsg.fromUser)) {
+	    wxMsg['groupId'] = wxMsg.fromUser
+	    wxMsg['fromUser'] = wxMsg.content.substr(0, wxMsg.content.indexOf(':\n'))
+	    wxMsg['content'] = wxMsg.content.substr(wxMsg.content.indexOf(':\n') + 2)	    
+	  }
+
+	  try {
+	    let xml = typeof wxMsg['content'] === 'object' ? wxMsg['content'] : await parseXml(wxMsg['content'])
+	    if (!xml) {
+	      console.log('message missing element', xml, originWxMsg)
+	    }
+	    wxMsg['content'] = xml
+	    let {timestamp} = wxMsg
+	    if (timestamp * 1000 > +new Date() - 30 * 1000) {
+	      o['fn'](wxMsg, wx)
+	    }
+	    break
+	  } catch(e) {
+	    console.log(e)
+	    console.log(originWxMsg)
+	  }	  
+	} else {
+	  console.log('EMPTY MESSAGE: ', wxMsg)
+	  break
+	}	
       } else if (mType === o.mType && mType === messageTypeMapping.friendRequest) {
         // 好友请求是看他的好友请求备注
         // let Event = wxMsg.friendRequest
@@ -132,6 +162,12 @@ module.exports = {
     funcStack.push({
       mType: messageTypeMapping['link'],
       regExp,
+      fn
+    })
+  },
+  emoji: (fn) => {
+    funcStack.push({
+      mType: messageTypeMapping['emoji'],
       fn
     })
   },

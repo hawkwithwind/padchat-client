@@ -130,6 +130,10 @@ router.link(/.*/, async (msg, wx) => {
   botClient.callback({eventType: 'MESSAGE', body: stringify(msg)})
 })
 
+router.emoji(async (msg, wx) => {
+  botClient.callback({eventType: 'MESSAGE', body: stringify(msg)})
+})
+
 async function runEventTunnel(bot) {
   log.info("begin grpc connection");
   botClient.flag = true;
