@@ -312,7 +312,7 @@ async function runEventTunnel(bot) {
 	    return
 	  }
 	  ret = await bot.wxbot.setRoomName(groupId, content)	
-	} else if (actionType == "GetContantQRCode") {
+	} else if (actionType == "GetContactQRCode") {
 	  userId = bodym.userId
 	  style = bodym.style
 	  if (userId === undefined || style === undefined) {
