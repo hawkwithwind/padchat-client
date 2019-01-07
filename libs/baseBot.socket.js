@@ -4,8 +4,7 @@ const log4js  = require('log4js')
 const Padchat = require('padchat-sdk')
 const fs      = require('fs')
 const util    = require('util')
-const qrcode  = require('qrcode-terminal')
-const image2base64 = require('image-to-base64')
+const qrcode  = require('qrcode')
 const x2j     = require('xml2js')
 const uuidv4  = require('uuid/v4')
 
@@ -164,12 +163,12 @@ module.exports = (config, botClient) => {
       // 如果存在url，则直接在终端中生成二维码并显示
       if (data.url) {
 	logger.info(`登陆二维码内容为: "${data.url}"，请使用微信扫描下方二维码登陆!`)
-	//let qr = await image2base64(data.url)
-	//botClient.callback({eventType:'LOGINSCAN', body:{url: `data:image/png;base64, ${qr}`}})
-	
-	qrcode.generate(data.url, { small: false } ,function(qr) {
-	  botClient.callback({eventType:'LOGINSCAN', body: {url: `data:image/png;base64, ${qr}`}})
-	})
+	let qr = await qrcode.toDataURL(data.url)
+	botClient.callback({eventType:'LOGINSCAN', body: {url: qr}})
+		
+	// qrcode.generate(data.url, { small: false } ,function(qr) {
+	//   botClient.callback({eventType:'LOGINSCAN', body: {url: `data:image/png;base64, ${qr}`}})
+	// })
       } else {
 	logger.error(`未能获得登陆二维码`)
       }
