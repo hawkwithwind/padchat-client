@@ -21,6 +21,8 @@ RUN apt-get install -y locales && \
 ENV LANG="zh_CN.UTF-8"
 RUN locale -a
 
+RUN apt-get install -y ccrypt
+
 RUN npm config set registry=http://registry.npm.taobao.org -g
 
 USER node
