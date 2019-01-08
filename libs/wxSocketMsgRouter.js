@@ -153,10 +153,10 @@ module.exports = {
       } else if (mType === o.mType && mType === messageTypeMapping.statusMessage) {
 	if (wxMsg.content) {
 	  let originWxMsg = _.clone(wxMsg)
-	  if (/@chatroom$/.test(wxMsg.fromUser)) {
+	  if (/@chatroom$/.test(wxMsg.fromUser) && wxMsg.content.indexOf(':\n') > 0) {
 	    wxMsg['groupId'] = wxMsg.fromUser
 	    wxMsg['fromUser'] = wxMsg.content.substr(0, wxMsg.content.indexOf(':\n'))
-	    wxMsg['content'] = wxMsg.content.substr(wxMsg.content.indexOf(':\n') + 2)	    
+	    wxMsg['content'] = wxMsg.content.substr(wxMsg.content.indexOf(':\n') + 2)
 	  }
 
 	  try {
