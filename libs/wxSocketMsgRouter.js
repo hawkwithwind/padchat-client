@@ -24,7 +24,9 @@ const messageTypeMapping = {
   // 2001 红包消息
   redPacket: 2001,
   // 2000 转账消息
-  transfer: 2000
+  transfer: 2000,
+  // 10002 状态通知(群中为群变更消息、私信为撤回)
+  statusMessage: 10002 
 }
 
 // xmlParse的同步方法
@@ -142,12 +144,40 @@ module.exports = {
             o['fn'](wxMsg, wx)
             break
           }
-        }
+        }	
       } else if (mType === o.mType && mType === messageTypeMapping.contactPush) {
         // 联系人信息的推送用联系人的UserName来匹配，虽然我不知道这是什么东西
         if (o['regExp'].test(wxMsg['userName'])) {
           o['fn'](wxMsg, wx)
         }
+      } else if (mType === o.mType && mType === messageTypeMapping.statusMessage) {
+	if (wxMsg.content) {
+	  let originWxMsg = _.clone(wxMsg)
+	  if (/@chatroom$/.test(wxMsg.fromUser)) {
+	    wxMsg['groupId'] = wxMsg.fromUser
+	    wxMsg['fromUser'] = wxMsg.content.substr(0, wxMsg.content.indexOf(':\n'))
+	    wxMsg['content'] = wxMsg.content.substr(wxMsg.content.indexOf(':\n') + 2)	    
+	  }
+
+	  try {
+	    let xml = typeof wxMsg['content'] === 'object' ? wxMsg['content'] : await parseXml(wxMsg['content'])
+	    if (!xml) {
+	      console.log('message missing element', xml, originWxMsg)
+	    }
+	    wxMsg['content'] = xml
+	    let {timestamp} = wxMsg
+	    if (timestamp * 1000 > +new Date() - 30 * 1000) {
+	      o['fn'](wxMsg, wx)
+	    }
+	    break
+	  } catch(e) {
+	    console.log(e)
+	    console.log(originWxMsg)
+	  }	  
+	} else {
+	  console.log('EMPTY MESSAGE: ', wxMsg)
+	  break
+	}
       }
     }
   },
@@ -182,6 +212,12 @@ module.exports = {
     funcStack.push({
       mType: messageTypeMapping['contactPush'],
       regExp,
+      fn
+    })
+  },
+  statusMessage: (fn) => {
+    funcStack.push({
+      mType: messageTypeMapping['statusMessage'],
       fn
     })
   }
