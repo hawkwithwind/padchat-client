@@ -303,7 +303,7 @@ async function runEventTunnel(bot) {
 	} else if (actionType == "SetRoomAnnouncement") {
 	  groupId = bodym.groupId
 	  content = bodym.content
-	  if (groupId === undefined || userId === undefined ) {
+	  if (groupId === undefined || content === undefined ) {
 	    log.error("set room announcement message empty")
 	    return
 	  }
@@ -311,7 +311,7 @@ async function runEventTunnel(bot) {
 	} else if (actionType == "SetRoomName") {
 	  groupId = bodym.groupId
 	  content = bodym.content
-	  if (groupId === undefined || userId === undefined ) {
+	  if (groupId === undefined || content === undefined ) {
 	    log.error("set room name message empty")
 	    return
 	  }
@@ -324,6 +324,13 @@ async function runEventTunnel(bot) {
 	    return
 	  }
 	  ret = await bot.wxbot.getContactQrcode(userId, style)
+	} else if (actionType == "SearchContact"){
+	  userId = bodym.userId
+	  if (userId === undefined) {
+	    log.error("search contact message empty")
+	    return
+	  }
+	  ret = await bot.wxbot.searchContact(userId)
 	} else {
 	  log.error("unsupported action", actionType)
 	}
