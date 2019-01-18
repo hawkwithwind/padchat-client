@@ -197,12 +197,18 @@ async function runEventTunnel(bot) {
 	  ret = await bot.wxbot.sendMsg(toUserName, content, atList)
 	} else if (actionType == "SendAppMessage") {
 	  let toUserName = bodym.toUserName
-	  let object = bodym.object
-	  if (toUserName === undefined || object === undefined) {
-	    log.error("send app message empty")
-	    return
-	  }
-	  ret = await bot.wxbot.sendAppMsg(toUserName, object)
+	  if (bodym.object) {
+	    let object = bodym.object
+	    if (toUserName === undefined || object === undefined) {
+	      log.error("send app message empty")
+	      return
+	    }
+	    ret = await bot.wxbot.sendAppMsg(toUserName, object)
+	  } else if (bodym.xml) {
+	    let xml = bodym.xml
+	    log.info("xml\n%s\n", xml)
+	    ret = await bot.wxbot.sendAppMsg(toUserName, xml)
+	  }	  
 	} else if (actionType == "SendImageResourceMessage") {
 	  let toUserName = bodym.toUserName
 	  let imageId = bodym.imageId
