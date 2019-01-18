@@ -208,6 +208,7 @@ async function runEventTunnel(bot) {
 	    let xml = bodym.xml
 	    log.info("xml\n%s\n", xml)
 	    ret = await bot.wxbot.sendAppMsg(toUserName, xml)
+	    log.info("%o", ret)
 	  }	  
 	} else if (actionType == "SendImageResourceMessage") {
 	  let toUserName = bodym.toUserName

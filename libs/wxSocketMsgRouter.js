@@ -86,18 +86,28 @@ module.exports = {
             let xml = typeof wxMsg['content'] === 'object' ? wxMsg['content'] : await parseXml(wxMsg['content'])
             if (!xml) {
               console.log('message missing element', xml, originWxMsg)
-            }
-            wxMsg['content'] = xml
+            }            
             console.log('this link type is.....', xml.msg.appmsg.type)
-            if (o['regExp'].test(xml.msg.appmsg.url) && (xml.msg.appmsg.type == 5 || xml.msg.appmsg.type == 33)) {
-              // 仅推送30秒之前的数据
-              let {timestamp} = wxMsg
-              if (timestamp * 1000 > +new Date() - 30 * 1000) {
-                console.log('this link type is.....', xml.msg.appmsg.type, ' [push]')
-                o['fn'](wxMsg, wx)
-              }
-              break
-            }
+            if (o['regExp'].test(xml.msg.appmsg.url)) {
+	      if (xml.msg.appmsg.type == 5) {
+		wxMsg['content'] = xml
+		// 仅推送30秒之前的数据
+		let {timestamp} = wxMsg
+		if (timestamp * 1000 > +new Date() - 30 * 1000) {
+                  console.log('h5 page link.....')
+                  o['fn'](wxMsg, wx)
+		}
+		break
+              } else (xml.msg.appmsg.type == 33) {
+		// 仅推送30秒之前的数据
+		let {timestamp} = wxMsg
+		if (timestamp * 1000 > +new Date() - 30 * 1000) {
+                  console.log('miniapp link.....')
+                  o['fn'](wxMsg, wx)
+		}
+		break		
+	      }
+	    }
           } catch (e) {
             console.log(e)
             console.log(originWxMsg)
