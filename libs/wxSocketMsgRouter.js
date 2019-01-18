@@ -89,11 +89,11 @@ module.exports = {
             }
             wxMsg['content'] = xml
             console.log('this link type is.....', xml.msg.appmsg.type)
-            if (o['regExp'].test(xml.msg.appmsg.url) && xml.msg.appmsg.type == 5) {
+            if (o['regExp'].test(xml.msg.appmsg.url) && (xml.msg.appmsg.type == 5 || xml.smg.appmsg.type == 33)) {
               // 仅推送30秒之前的数据
               let {timestamp} = wxMsg
               if (timestamp * 1000 > +new Date() - 30 * 1000) {
-                console.log('this link type is.....', xml.msg.appmsg.type)
+                console.log('this link type is.....', xml.msg.appmsg.type, ' [push]')
                 o['fn'](wxMsg, wx)
               }
               break
