@@ -99,10 +99,7 @@ module.exports = {
 		}
 		break
               } else if (xml.msg.appmsg.type == 33) {
-		wxMsg['content'] = {
-		  'xmlappmsg': 'true',
-		  'xml': xml
-		}
+		wxMsg['content'] = xml
 		// 仅推送30秒之前的数据
 		let {timestamp} = wxMsg
 		if (timestamp * 1000 > +new Date() - 30 * 1000) {
