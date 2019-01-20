@@ -359,20 +359,22 @@ module.exports = (config, botClient) => {
           break
         }
         logger.info('收到来自 %s 的文本消息：', data.fromUser, data.description || data.content)
+	
         if (/ding/.test(data.content)) {
-          await wx.sendMsg(data.fromUser, 'dong. receive:' + data.content)
-            .then(ret => {
-              logger.info('回复信息给%s 结果：', data.fromUser, ret)
-            })
-            .catch(e => {
-              logger.warn('回复信息异常:', e.message)
-            })
+          // await wx.sendMsg(data.fromUser, 'dong. receive:' + data.content)
+          //   .then(ret => {
+          //     logger.info('回复信息给%s 结果：', data.fromUser, ret)
+          //   })
+          //   .catch(e => {
+          //     logger.warn('回复信息异常:', e.message)
+          //   })
         } else if (/^#.*/.test(data.content) || /^[\w]*:\n#.*/.test(data.content)) {
           await onMsg(data)
             .catch(e => {
               logger.warn('处理信息异常：', e)
             })
-        }
+	}
+      
         break
 	
       case 2:
