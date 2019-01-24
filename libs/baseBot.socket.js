@@ -7,6 +7,7 @@ const util    = require('util')
 const qrcode  = require('qrcode')
 const x2j     = require('xml2js')
 const uuidv4  = require('uuid/v4')
+var   ZabbixSender = require('node-zabbix-sender')
 
 /**
 * 创建日志目录
@@ -73,13 +74,12 @@ module.exports = (config, botClient) => {
   let server = `${config.padchatServer}:${config.padchatPort}/${config.padchatToken}`
   logger.info(`connect to server ${server}`)
 
+  let zbx_sender = new ZabbixSender({host: config.zabbix.host})
+  logger.info(`connect to zabbix server ${config.zabbix.host}`)
+
   const wx = new Padchat(server)
   logger.info('padchat client started')
 
-  wx.ws.on('pong', () => {
-    logger.info('[TEST] receiving pong.')
-  })
-  
   let disconnectCount = 0      // 断开计数
   let connected       = false  // 成功连接标志
   
@@ -106,6 +106,43 @@ module.exports = (config, botClient) => {
       let ret
       logger.info('连接成功!')
       connected = true
+
+      wx.ws.isAlive = true
+      wx.ws.pingTimeout = setTimeout(() => {
+	if (wx.ws.isAlive === false) {
+	  //send zabbix alert
+	  Sender.addItem(`${config.zabbix.host}`, `${config.zabbix.key}`, 0).send((err, res) => {
+	    if (err) { throw err }
+ 	    // print the response object
+	    logger.info('zabbix res %o', res)
+	  })
+	  return
+	}
+
+	wx.ws.isAlive = false
+	ws.ping(() => {})
+      }, 60 * 1000)
+      
+      wx.ws.on('pong', () => {
+	wx.ws.isAlive = true
+	//send zabbix ok
+	Sender.addItem(`${config.zabbix.host}`, `${config.zabbix.key}`, 1).send((err, res) => {
+	  if (err) { throw err }
+ 	  // print the response object
+	  logger.info('zabbix res %o', res)
+	})
+      })
+
+      wx.ws.on('close', () => {
+	wx.ws.isAlive = false
+	//send zabbix alert
+	Sender.addItem(`${config.zabbix.host}`, `${config.zabbix.key}`, 0).send((err, res) => {
+	  if (err) { throw err }
+ 	  // print the response object
+	  logger.info('zabbix res %o', res)
+	})
+	clearTimeout(wx.ws.pingTimeout)
+      })
 
       // 非首次登录时最好使用以前成功登录时使用的设备参数，
       // 否则可能会被tx服务器怀疑账号被盗，导致手机端被登出
