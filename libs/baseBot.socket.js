@@ -113,8 +113,6 @@ module.exports = (config, botClient) => {
 	  //send zabbix alert
 	  zbx_sender.addItem(`${config.zabbix.host}`, `${config.zabbix.key}`, 0).send((err, res) => {
 	    if (err) { throw err }
- 	    // print the response object
-	    logger.info('zabbix res %o', res)
 	  })
 	  return
 	}
@@ -128,8 +126,6 @@ module.exports = (config, botClient) => {
 	//send zabbix ok
 	zbx_sender.addItem(`${config.zabbix.host}`, `${config.zabbix.key}`, 1).send((err, res) => {
 	  if (err) { throw err }
- 	  // print the response object
-	  logger.info('zabbix res %o', res)
 	})
       })
 
@@ -138,8 +134,6 @@ module.exports = (config, botClient) => {
 	//send zabbix alert
 	zbx_sender.addItem(`${config.zabbix.host}`, `${config.zabbix.key}`, 0).send((err, res) => {
 	  if (err) { throw err }
- 	  // print the response object
-	  logger.info('zabbix res %o', res)
 	})
 	clearTimeout(wx.ws.pingTimeout)
       })
@@ -401,9 +395,6 @@ module.exports = (config, botClient) => {
         }
         logger.info('收到来自 %s 的文本消息：', data.fromUser, data.description || data.content)
 
-	logger.info('try send ping')
-	wx.ws.ping('')
-	
         if (/ding/.test(data.content)) {
           // await wx.sendMsg(data.fromUser, 'dong. receive:' + data.content)
           //   .then(ret => {
