@@ -75,6 +75,10 @@ module.exports = (config, botClient) => {
 
   const wx = new Padchat(server)
   logger.info('padchat client started')
+
+  wx.ws.on('pong', () => {
+    logger.info('[TEST] receiving pong.')
+  })
   
   let disconnectCount = 0      // 断开计数
   let connected       = false  // 成功连接标志
@@ -359,6 +363,9 @@ module.exports = (config, botClient) => {
           break
         }
         logger.info('收到来自 %s 的文本消息：', data.fromUser, data.description || data.content)
+
+	logger.info('try send ping')
+	wx.ws.ping('')
 	
         if (/ding/.test(data.content)) {
           // await wx.sendMsg(data.fromUser, 'dong. receive:' + data.content)
