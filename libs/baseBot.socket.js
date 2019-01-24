@@ -7,7 +7,7 @@ const util    = require('util')
 const qrcode  = require('qrcode')
 const x2j     = require('xml2js')
 const uuidv4  = require('uuid/v4')
-//var   ZabbixSender = require('node-zabbix-sender')
+var   ZabbixSender = require('node-zabbix-sender')
 
 /**
 * 创建日志目录
@@ -74,8 +74,8 @@ module.exports = (config, botClient) => {
   let server = `${config.padchatServer}:${config.padchatPort}/${config.padchatToken}`
   logger.info(`connect to server ${server}`)
 
-  //let zbx_sender = new ZabbixSender({host: config.zabbix.server, port: config.zabbix.port})
-  //logger.info(`connect to zabbix server ${config.zabbix.server}:${config.zabbix.port}`)
+  let zbx_sender = new ZabbixSender({host: config.zabbix.server, port: config.zabbix.port})
+  logger.info(`connect to zabbix server ${config.zabbix.server}:${config.zabbix.port}`)
 
   const wx = new Padchat(server)
   logger.info('padchat client started')
@@ -107,36 +107,36 @@ module.exports = (config, botClient) => {
       logger.info('连接成功!')
       connected = true
 
-      // wx.ws.isAlive = true
-      // wx.ws.pingTimeout = setTimeout(() => {
-      // 	if (wx.ws.isAlive === false) {
-      // 	  //send zabbix alert
-      // 	  zbx_sender.addItem(`${config.zabbix.host}`, `${config.zabbix.key}`, 0).send((err, res) => {
-      // 	    if (err) { throw err }
-      // 	  })
-      // 	  return
-      // 	}
+      wx.ws.isAlive = true
+      wx.ws.pingTimeout = setTimeout(() => {
+      	if (wx.ws.isAlive === false) {
+      	  //send zabbix alert
+      	  zbx_sender.addItem(`${config.zabbix.host}`, `${config.zabbix.key}`, 0).send((err, res) => {
+      	    if (err) { throw err }
+      	  })
+      	  return
+      	}
 
-      // 	wx.ws.isAlive = false
-      // 	wx.ws.ping(() => {})
-      // }, 60 * 1000)
+      	wx.ws.isAlive = false
+      	wx.ws.ping(() => {})
+      }, 60 * 1000)
       
-      // wx.ws.on('pong', () => {
-      // 	wx.ws.isAlive = true
-      // 	//send zabbix ok
-      // 	zbx_sender.addItem(`${config.zabbix.host}`, `${config.zabbix.key}`, 1).send((err, res) => {
-      // 	  if (err) { throw err }
-      // 	})
-      // })
+      wx.ws.on('pong', () => {
+      	wx.ws.isAlive = true
+      	//send zabbix ok
+      	zbx_sender.addItem(`${config.zabbix.host}`, `${config.zabbix.key}`, 1).send((err, res) => {
+      	  if (err) { throw err }
+      	})
+      })
 
-      // wx.ws.on('close', () => {
-      // 	wx.ws.isAlive = false
-      // 	//send zabbix alert
-      // 	zbx_sender.addItem(`${config.zabbix.host}`, `${config.zabbix.key}`, 0).send((err, res) => {
-      // 	  if (err) { throw err }
-      // 	})
-      // 	clearTimeout(wx.ws.pingTimeout)
-      // })
+      wx.ws.on('close', () => {
+      	wx.ws.isAlive = false
+      	//send zabbix alert
+      	zbx_sender.addItem(`${config.zabbix.host}`, `${config.zabbix.key}`, 0).send((err, res) => {
+      	  if (err) { throw err }
+      	})
+      	clearTimeout(wx.ws.pingTimeout)
+      })
 
       // 非首次登录时最好使用以前成功登录时使用的设备参数，
       // 否则可能会被tx服务器怀疑账号被盗，导致手机端被登出
