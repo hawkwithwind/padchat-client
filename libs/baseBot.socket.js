@@ -74,8 +74,8 @@ module.exports = (config, botClient) => {
   let server = `${config.padchatServer}:${config.padchatPort}/${config.padchatToken}`
   logger.info(`connect to server ${server}`)
 
-  let zbx_sender = new ZabbixSender({host: config.zabbix.host})
-  logger.info(`connect to zabbix server ${config.zabbix.host}`)
+  let zbx_sender = new ZabbixSender({host: config.zabbix.server, port: config.zabbix.port})
+  logger.info(`connect to zabbix server ${config.zabbix.server}:${config.zabbix.port}`)
 
   const wx = new Padchat(server)
   logger.info('padchat client started')
@@ -111,7 +111,7 @@ module.exports = (config, botClient) => {
       wx.ws.pingTimeout = setTimeout(() => {
 	if (wx.ws.isAlive === false) {
 	  //send zabbix alert
-	  Sender.addItem(`${config.zabbix.host}`, `${config.zabbix.key}`, 0).send((err, res) => {
+	  zbx_sender.addItem(`${config.zabbix.host}`, `${config.zabbix.key}`, 0).send((err, res) => {
 	    if (err) { throw err }
  	    // print the response object
 	    logger.info('zabbix res %o', res)
@@ -126,7 +126,7 @@ module.exports = (config, botClient) => {
       wx.ws.on('pong', () => {
 	wx.ws.isAlive = true
 	//send zabbix ok
-	Sender.addItem(`${config.zabbix.host}`, `${config.zabbix.key}`, 1).send((err, res) => {
+	zbx_sender.addItem(`${config.zabbix.host}`, `${config.zabbix.key}`, 1).send((err, res) => {
 	  if (err) { throw err }
  	  // print the response object
 	  logger.info('zabbix res %o', res)
@@ -136,7 +136,7 @@ module.exports = (config, botClient) => {
       wx.ws.on('close', () => {
 	wx.ws.isAlive = false
 	//send zabbix alert
-	Sender.addItem(`${config.zabbix.host}`, `${config.zabbix.key}`, 0).send((err, res) => {
+	zbx_sender.addItem(`${config.zabbix.host}`, `${config.zabbix.key}`, 0).send((err, res) => {
 	  if (err) { throw err }
  	  // print the response object
 	  logger.info('zabbix res %o', res)
