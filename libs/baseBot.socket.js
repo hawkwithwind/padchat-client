@@ -108,17 +108,17 @@ module.exports = (config, botClient) => {
       connected = true
 
       wx.ws.isAlive = true
-      wx.ws.pingTimeout = setTimeout(() => {
-      	if (wx.ws.isAlive === false) {
-      	  //send zabbix alert
-      	  zbx_sender.addItem(`${config.zabbix.host}`, `${config.zabbix.key}`, 0).send((err, res) => {
+      wx.ws.pingLoop = setInterval(() => {
+        if(wx.ws.isAlive === false) {
+          //send zabbix alert
+          zbx_sender.addItem(`${config.zabbix.host}`, `${config.zabbix.key}`, 0).send((err, res) => {
       	    if (err) { throw err }
       	  })
       	  return
-      	}
+        }
 
-      	wx.ws.isAlive = false
-      	wx.ws.ping(() => {})
+        wx.ws.isAlive = false
+        wx.ws.ping(() => {})
       }, 60 * 1000)
       
       wx.ws.on('pong', () => {
@@ -127,7 +127,7 @@ module.exports = (config, botClient) => {
       	zbx_sender.addItem(`${config.zabbix.host}`, `${config.zabbix.key}`, 1).send((err, res) => {
       	  if (err) { throw err }
           logger.info('zbx %o', res)
-      	})        
+      	})
       })
 
       wx.ws.on('close', () => {
@@ -136,7 +136,7 @@ module.exports = (config, botClient) => {
       	zbx_sender.addItem(`${config.zabbix.host}`, `${config.zabbix.key}`, 0).send((err, res) => {
       	  if (err) { throw err }
       	})
-      	clearTimeout(wx.ws.pingTimeout)
+      	clearInterval(wx.ws.pingLoop)
       })
 
       // 非首次登录时最好使用以前成功登录时使用的设备参数，
