@@ -126,7 +126,7 @@ module.exports = (config, botClient) => {
       	//send zabbix ok
       	zbx_sender.addItem(`${config.zabbix.host}`, `${config.zabbix.key}`, 1).send((err, res) => {
       	  if (err) { throw err }
-          logger.info('zbx %o', res)
+          //logger.info('zbx %o', res)
       	})
       })
 
@@ -265,8 +265,7 @@ module.exports = (config, botClient) => {
     })
     .on('login', async () => {
       logger.info('微信账号登陆成功！')
-      let ret
-      ret = await wx.getMyInfo()
+      let ret = await wx.getMyInfo()
       logger.info('当前账号信息：', ret.data)
       botClient.loginData = ret.data
 
