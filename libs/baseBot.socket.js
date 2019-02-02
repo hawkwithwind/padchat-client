@@ -126,7 +126,8 @@ module.exports = (config, botClient) => {
       	//send zabbix ok
       	zbx_sender.addItem(`${config.zabbix.host}`, `${config.zabbix.key}`, 1).send((err, res) => {
       	  if (err) { throw err }
-      	})
+          logger.info('%o res')
+      	})        
       })
 
       wx.ws.on('close', () => {
