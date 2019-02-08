@@ -322,7 +322,22 @@ async function runEventTunnel(bot) {
 	    log.error("set room name message empty")
 	    return
 	  }
-	  ret = await bot.wxbot.setRoomName(groupId, content)	
+	  ret = await bot.wxbot.setRoomName(groupId, content)
+	} else if (actionType == "GetRoomQRCode"){
+          groupId = bodym.groupId
+          if (groupId === undefined) {
+	    log.error("get room qrcode message empty")
+	    return
+	  }
+          ret = await bot.wxbot.getRoomQrcode(groupId)
+          if(ret.success && ret.data) {
+            let roomNumber = groupId.substring(0, groupId.indexOf('@chatroom'))
+            let qrcode = ret.data.qrCode
+            qrcode = qrcode.replace(/^data:image\/png;base64,/, "")
+            fs.writeFile(`./config/data/${roomNumber}.png`, qrcode, 'base64', function(err) {
+              log.error(err)
+            })
+          }
 	} else if (actionType == "GetContactQRCode") {
 	  userId = bodym.userId
 	  style = bodym.style
@@ -330,7 +345,7 @@ async function runEventTunnel(bot) {
 	    log.error("get contact qrcode message empty")
 	    return
 	  }
-	  ret = await bot.wxbot.getContactQrcode(userId, style)
+	  ret = await bot.wxbot.getContactQrcode(userId, style)          
 	} else if (actionType == "SearchContact"){
 	  userId = bodym.userId
 	  if (userId === undefined) {
