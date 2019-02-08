@@ -283,6 +283,19 @@ async function runEventTunnel(bot) {
 	    return
 	  }
 	  ret = await bot.wxbot.getRoomQrcode(groupId)
+
+          if(ret.success && ret.data && ret.data.qrCode) {
+            let roomNumber = groupId.substring(0, groupId.indexOf('@chatroom'))
+            log.info('saving image for %s', roomNumber)
+            
+            let qrcode = ret.data.qrCode
+            qrcode = qrcode.replace(/^data:image\/png;base64,/, "")
+            fs.writeFile(`./config/data/${roomNumber}.png`, qrcode, 'base64', function(err) {
+              log.error(err)
+            })
+          } else {
+            log.error("get room qrcode failed with \n%o\n", ret)
+          }
 	} else if (actionType == "AddRoomMember") {
 	  groupId = bodym.groupId
 	  userId = bodym.userId
@@ -323,25 +336,6 @@ async function runEventTunnel(bot) {
 	    return
 	  }
 	  ret = await bot.wxbot.setRoomName(groupId, content)
-	} else if (actionType == "GetRoomQRCode"){
-          groupId = bodym.groupId
-          if (groupId === undefined) {
-	    log.error("get room qrcode message empty")
-	    return
-	  }
-          ret = await bot.wxbot.getRoomQrcode(groupId)
-          if(ret.success && ret.data) {
-            let roomNumber = groupId.substring(0, groupId.indexOf('@chatroom'))
-            log.info('saving image for %s', roomNumber)
-            
-            let qrcode = ret.data.qrCode
-            qrcode = qrcode.replace(/^data:image\/png;base64,/, "")
-            fs.writeFile(`./config/data/${roomNumber}.png`, qrcode, 'base64', function(err) {
-              log.error(err)
-            })
-          } else {
-            log.error("get room qrcode failed with \n%o\n", ret)
-          }
 	} else if (actionType == "GetContactQRCode") {
 	  userId = bodym.userId
 	  style = bodym.style
