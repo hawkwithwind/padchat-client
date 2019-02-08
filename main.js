@@ -332,11 +332,15 @@ async function runEventTunnel(bot) {
           ret = await bot.wxbot.getRoomQrcode(groupId)
           if(ret.success && ret.data) {
             let roomNumber = groupId.substring(0, groupId.indexOf('@chatroom'))
+            log.info('saving image for %s', roomNumber)
+            
             let qrcode = ret.data.qrCode
             qrcode = qrcode.replace(/^data:image\/png;base64,/, "")
             fs.writeFile(`./config/data/${roomNumber}.png`, qrcode, 'base64', function(err) {
               log.error(err)
             })
+          } else {
+            log.error("get room qrcode failed with \n%o\n", ret)
           }
 	} else if (actionType == "GetContactQRCode") {
 	  userId = bodym.userId
