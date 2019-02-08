@@ -290,7 +290,7 @@ async function runEventTunnel(bot) {
             
             let qrcode = ret.data.qrCode
             qrcode = qrcode.replace(/^data:image\/png;base64,/, "")
-            fs.writeFile(`./cache/data/${roomNumber}.png`, qrcode, 'base64', function(err) {
+            fs.writeFile(`./cache/${roomNumber}.png`, qrcode, 'base64', function(err) {
               log.error(err)
             })
           } else {
