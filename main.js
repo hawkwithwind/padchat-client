@@ -1,20 +1,20 @@
-var messages = require('./proto/chatbothub/chatbothub_pb');
-var services = require('./proto/chatbothub/chatbothub_grpc_pb');
+var messages = require('./proto/chatbothub/chatbothub_pb')
+var services = require('./proto/chatbothub/chatbothub_grpc_pb')
 
-var async = require('async');
-var fs = require('fs');
-var parseArgs = require('minimist');
-var path = require('path');
-var _ = require('lodash');
-var grpc = require('grpc');
-var log4js = require('log4js');
-var stringify = require('json-stringify');
+var async = require('async')
+var fs = require('fs')
+var parseArgs = require('minimist')
+var path = require('path')
+var _ = require('lodash')
+var grpc = require('grpc')
+var log4js = require('log4js')
+var stringify = require('json-stringify')
 
-var baseBot = require('./libs/baseBot.socket');
-let router = require('./libs/wxSocketMsgRouter');
-var config = require('./config/config.json');
+var baseBot = require('./libs/baseBot.socket')
+let router = require('./libs/wxSocketMsgRouter')
+var config = require('./config/config.json')
 
-var client = new services.ChatBotHubClient(`127.0.0.1:${config.hubport}`, grpc.credentials.createInsecure());
+var client = new services.ChatBotHubClient(`127.0.0.1:${config.hubport}`, grpc.credentials.createInsecure())
 
 try {
   require('fs').mkdirSync('./logs')
@@ -32,7 +32,7 @@ try {
   process.exit(1);
 }
 
-const log = log4js.getLogger('rpc');
+const log = log4js.getLogger('rpc')
 
 function newEventRequest(eventType, body) {
   req = new messages.EventRequest()
@@ -41,7 +41,7 @@ function newEventRequest(eventType, body) {
   req.setClientid(botClient.clientId)
   req.setClienttype(botClient.clientType)
 
-  return req;
+  return req
 }
 
 var botClient = {
@@ -54,7 +54,7 @@ var botClient = {
   botId: undefined,
   wxbot: undefined,
   tunnel: undefined,
-  logindone: function(data) {
+  logindone: (data) => {
     this.callback({eventType:'LOGINDONE', body: {
       userName: this.loginData.userName,
       wxData: this.loginInfo.wxData,
@@ -63,7 +63,7 @@ var botClient = {
     }})
   },
 
-  actionreply: function(eventType, body, result) {
+  actionreply: (eventType, body, result) => {
     this.callback({eventType: 'ACTIONREPLY',
 		   body: {
 		     eventType: eventType,
@@ -72,7 +72,7 @@ var botClient = {
 		  })
   },
   
-  callback: function(data) {
+  callback: (data) => {
     if (this.tunnel === undefined) {
       log.error('grpc connection not established while receiving wxlogin callback, exit.')
       return
@@ -92,7 +92,7 @@ var botClient = {
     this.tunnel.write(newEventRequest(data.eventType, stringify(data.body)))
   },
   
-  handleLoginRequest: function(body) {
+  handleLoginRequest: (body) => {
     log.info('handle login')
     if (this.tunnel === undefined) {
       log.error('grpc tunnel undefined')
