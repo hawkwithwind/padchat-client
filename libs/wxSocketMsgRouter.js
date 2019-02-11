@@ -51,8 +51,6 @@ module.exports = {
   handle: async (wxMsg, wx) => {
     // 消息类型
     let {mType} = wxMsg
-    console.log('~~~ receive mType %o', mType)
-    
     for (let o of funcStack) {
       // console.log('func---', o['fn'].toString())
       if (mType === o.mType && mType === messageTypeMapping.text) {
@@ -159,12 +157,9 @@ module.exports = {
           }
         }	
       } else if (mType === o.mType && mType === messageTypeMapping.contactPush) {
-        console.log('~~~ receives contact push')
-        
-        // 联系人信息的推送用联系人的UserName来匹配，这个就是wxid
-        if (o['regExp'].test(wxMsg['userName'])) {
-          o['fn'](wxMsg, wx)
-        }
+        o['fn'](wxMsg, wx)
+      } else if (mType === o.mType && mType === messageTypeMapping.groupPush) {
+        o['fn'](wxMsg, wx)
       } else if (mType === o.mType && mType === messageTypeMapping.statusMessage) {
 	if (wxMsg.content) {
 	  let originWxMsg = _.clone(wxMsg)
