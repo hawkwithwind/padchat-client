@@ -51,6 +51,8 @@ module.exports = {
   handle: async (wxMsg, wx) => {
     // 消息类型
     let {mType} = wxMsg
+    console.log('~~~ receive mType %o', mType)
+    
     for (let o of funcStack) {
       // console.log('func---', o['fn'].toString())
       if (mType === o.mType && mType === messageTypeMapping.text) {

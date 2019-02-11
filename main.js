@@ -117,6 +117,9 @@ var botClient = {
       this.wxbot.on('push', data => {
 	router.handle(data, this.wxbot)
       })
+      this.wxbot.on('contact', data=> {
+        router.handle(data, this.wxbot)
+      })
     }
   }
 }
