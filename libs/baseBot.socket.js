@@ -414,12 +414,12 @@ module.exports = (config, botClient) => {
 	
       case 2:
 	logger.info('收到来自 %s 的联系人消息', data.fromUser)
-	botClient.callback({eventType:'CONTACTINFO', body:data})
+	//botClient.callback({eventType:'CONTACTINFO', body:data})
 	break
 
       case 10000:
 	logger.info('收到群变更消息', data)
-	botClient.callback({eventType:'GROUPINFO', body:data})
+	//botClient.callback({eventType:'GROUPINFO', body:data})
 	break
 
       case 34:

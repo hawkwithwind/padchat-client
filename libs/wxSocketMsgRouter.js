@@ -25,8 +25,10 @@ const messageTypeMapping = {
   redPacket: 2001,
   // 2000 转账消息
   transfer: 2000,
+  // 10000 群变更消息通知
+  groupPush: 10000,
   // 10002 状态通知(群中为群变更消息、私信为撤回)
-  statusMessage: 10002 
+  statusMessage: 10002,
 }
 
 // xmlParse的同步方法
@@ -221,10 +223,15 @@ module.exports = {
       fn
     })
   },
-  contactPush: (regExp, fn) => {
+  contactPush: (fn) => {
     funcStack.push({
       mType: messageTypeMapping['contactPush'],
-      regExp,
+      fn
+    })
+  },
+  groupPush: (fn) => {
+    funcStack.push({
+      mType: messageTypeMapping['groupPush'],
       fn
     })
   },

@@ -130,8 +130,12 @@ router.link(/.*/, async (msg, wx) => {
   botClient.callback({eventType: 'MESSAGE', body: stringify(msg)})
 })
 
-router.contactPush(/.*/, async (msg, wx) => {
-  botClient.callback({eventType: 'CONTACTPUSH', body: stringify(msg)})
+router.contactPush(async (msg, wx) => {
+  botClient.callback({eventType: 'CONTACTINFO', body: msg})
+})
+
+router.groupPush(async (msg, wx) => {
+  botClient.callback({eventType:'GROUPINFO', body:msg})
 })
 
 router.emoji(async (msg, wx) => {
