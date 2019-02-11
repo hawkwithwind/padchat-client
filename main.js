@@ -130,6 +130,10 @@ router.link(/.*/, async (msg, wx) => {
   botClient.callback({eventType: 'MESSAGE', body: stringify(msg)})
 })
 
+router.contactPush(/.*/, async (msg, wx) => {
+  botClient.callback({eventType: 'CONTACTPUSH', body: stringify(msg)})
+})
+
 router.emoji(async (msg, wx) => {
   botClient.callback({eventType: 'MESSAGE', body: stringify(msg)})
 })
@@ -289,8 +293,8 @@ async function runEventTunnel(bot) {
             log.info('saving image for %s', roomNumber)
             
             let qrcode = ret.data.qrCode
-            qrcode = qrcode.replace(/^data:image\/png;base64,/, "")
-            fs.writeFile(`./cache/${roomNumber}.png`, qrcode, 'base64', function(err) {
+            qrcode = qrcode.replace(/^data:image\/jpeg;base64,/, "")
+            fs.writeFile(`./cache/${roomNumber}.jpg`, qrcode, 'base64', function(err) {
               log.error(err)
             })
           } else {

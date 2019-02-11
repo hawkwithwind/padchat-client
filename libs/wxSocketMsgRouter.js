@@ -157,7 +157,7 @@ module.exports = {
           }
         }	
       } else if (mType === o.mType && mType === messageTypeMapping.contactPush) {
-        // 联系人信息的推送用联系人的UserName来匹配，虽然我不知道这是什么东西
+        // 联系人信息的推送用联系人的UserName来匹配，这个就是wxid
         if (o['regExp'].test(wxMsg['userName'])) {
           o['fn'](wxMsg, wx)
         }
