@@ -54,7 +54,7 @@ var botClient = {
   botId: undefined,
   wxbot: undefined,
   tunnel: undefined,
-  logindone: (data) => {
+  logindone: function(data) {
     this.callback({eventType:'LOGINDONE', body: {
       userName: this.loginData.userName,
       wxData: this.loginInfo.wxData,
@@ -63,7 +63,7 @@ var botClient = {
     }})
   },
 
-  actionreply: (eventType, body, result) => {
+  actionreply: function(eventType, body, result) {
     this.callback({eventType: 'ACTIONREPLY',
 		   body: {
 		     eventType: eventType,
@@ -72,7 +72,7 @@ var botClient = {
 		  })
   },
   
-  callback: (data) => {
+  callback: function(data) {
     if (this.tunnel === undefined) {
       log.error('grpc connection not established while receiving wxlogin callback, exit.')
       return
@@ -92,7 +92,7 @@ var botClient = {
     this.tunnel.write(newEventRequest(data.eventType, stringify(data.body)))
   },
   
-  handleLoginRequest: (body) => {
+  handleLoginRequest: function(body) {
     log.info('handle login')
     if (this.tunnel === undefined) {
       log.error('grpc tunnel undefined')
@@ -121,7 +121,7 @@ var botClient = {
   }
 }
 
-//router.botClient = botClient;
+//router.botClient = botClient
 router.text(/.*/, async (msg, wx) => {
   botClient.callback({eventType: 'MESSAGE', body: stringify(msg)})
 })
@@ -147,9 +147,9 @@ router.statusMessage(async (msg, wx) => {
 })
 
 async function runEventTunnel(bot) {
-  log.info("begin grpc connection");
-  botClient.flag = true;
-  botClient.tunnel = client.eventTunnel();
+  log.info("begin grpc connection")
+  botClient.flag = true
+  botClient.tunnel = client.eventTunnel()
   botClient.tunnel.on('data', async function(eventReply) {
     var eventType = eventReply.getEventtype()
     var body = eventReply.getBody()
@@ -157,7 +157,7 @@ async function runEventTunnel(bot) {
     var clientType = eventReply.getClienttype()
 
     if (eventType == 'PONG') {
-      //log.info("PONG " + clientType + " " + clientid);
+      //log.info("PONG " + clientType + " " + clientid)
     } else {
       if (botClient.tunnel === undefined) {
 	log.error('grpc botClient.tunnel undefined')
@@ -367,34 +367,34 @@ async function runEventTunnel(bot) {
 	  bot.actionreply(eventType, actionBody, ret)
 	}
       } else {
-	log.info("unhandled message " + stringify(eventReply));
+	log.info("unhandled message " + stringify(eventReply))
       }
     }
   });
 
   botClient.tunnel.on('error', function(e) {
-    log.error("grpc connection error", "code", e.code, e.details);
-    botClient.flag = false;
-    botClient.tunnel.end();
-  });
+    log.error("grpc connection error", "code", e.code, e.details)
+    botClient.flag = false
+    botClient.tunnel.end()
+  })
 
   botClient.tunnel.on('end', function() {
-    log.info("grpc connection closed");
-  });
+    log.info("grpc connection closed")
+  })
 
-  await botClient.tunnel.write(newEventRequest("REGISTER", "HELLO"));
+  await botClient.tunnel.write(newEventRequest("REGISTER", "HELLO"))
 
   if(botClient.loginData != undefined) {
-    log.info("resend login data...");
-    await botClient.logindone();
+    log.info("resend login data...")
+    await botClient.logindone()
   }
 
   while (botClient.flag) {
-    await botClient.tunnel.write(newEventRequest("PING", ""));
+    await botClient.tunnel.write(newEventRequest("PING", ""))
     await sleep(10 * 1000);
   }
 
-  botClient.tunnel.end();
+  botClient.tunnel.end()
 }
 
 function sleep(ms) {
@@ -406,16 +406,16 @@ function sleep(ms) {
 async function main() {
   while(true) {
     try {
-      await runEventTunnel(botClient);
+      await runEventTunnel(botClient)
     } catch (e) {
       log.error("connection failed, retrying ... ", e)
     }
-    await sleep(10 * 1000);
+    await sleep(10 * 1000)
   }
 }
 
 if (require.main === module) {
-  main();
+  main()
 }
 
-exports.runEventTunnel = runEventTunnel;
+exports.runEventTunnel = runEventTunnel

@@ -47,8 +47,6 @@ let parseXml = async (xml) => {
   })
 }
 
-
-
 module.exports = {
   handle: async (wxMsg, wx) => {
     // 消息类型
