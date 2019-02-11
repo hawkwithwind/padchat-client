@@ -267,7 +267,7 @@ async function runEventTunnel(bot) {
 	  }
 	  ret = await bot.wxbot.SayHello(stranger, ticket, content)
         } else if (actionType == "SyncContact") {
-          ret = await bot.wxbot.syncContact()
+          ret = await bot.wxbot.syncContact(true)
 	} else if (actionType == "GetContact") {
 	  userId = bodym.userId
 	  if (userId === undefined) {
