@@ -114,12 +114,13 @@ var botClient = {
 	this.loginInfo = loginInfo
       }
       this.wxbot = baseBot(config, this)
-      this.wxbot.on('push', data => {
-	router.handle(data, this.wxbot)
-      })
-      this.wxbot.on('contact', data=> {
-        router.handle(data, this.wxbot)
-      })
+      this.wxbot
+        .on('push', async (data) => {
+	  router.handle(data, this.wxbot)
+        })
+        .on('contact', async (data) => {
+          router.handle(data, this.wxbot)
+        })
     }
   }
 }
