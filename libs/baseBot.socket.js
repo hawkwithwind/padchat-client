@@ -305,7 +305,7 @@ module.exports = (config, botClient) => {
       logger.info('收到朋友圈事件！请查看朋友圈新消息哦！', msg)
     })
     .on('contact', async data => {
-      logger.info('收到推送联系人：%s - %s\n', data.userName, data.nickName, JSON.stringify(data))
+      logger.info('收到推送联系人：%s - %s', data.userName, data.nickName)
     })
     .on('push', async data => {
       // 消息类型 data.mType
