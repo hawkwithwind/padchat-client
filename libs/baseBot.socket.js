@@ -107,7 +107,7 @@ module.exports = (config, botClient) => {
       logger.info('连接成功!')
       connected = true
 
-      wx.ws.isAlive = true
+      wx.ws.isAlive = true      
       wx.ws.pingLoop = setInterval(() => {
         if(wx.ws.isAlive === false) {
           //send zabbix alert
@@ -139,9 +139,12 @@ module.exports = (config, botClient) => {
       	clearInterval(wx.ws.pingLoop)
       })
 
+      logger.info('初始化 1')
       // 非首次登录时最好使用以前成功登录时使用的设备参数，
       // 否则可能会被tx服务器怀疑账号被盗，导致手机端被登出
       ret = await wx.init()
+      logger.info('初始化 2')
+      
       if (!ret.success) {
 	logger.error('新建任务失败', ret)
 	return
