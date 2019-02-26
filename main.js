@@ -9,6 +9,8 @@ var _ = require('lodash')
 var grpc = require('grpc')
 var log4js = require('log4js')
 var stringify = require('json-stringify')
+const uuidv4  = require('uuid/v4')
+const image2base64 = require('image-to-base64')
 
 var baseBot = require('./libs/baseBot.socket')
 let router = require('./libs/wxSocketMsgRouter')
