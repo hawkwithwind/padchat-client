@@ -143,7 +143,20 @@ router.groupPush(async (msg, wx) => {
 })
 
 router.emoji(async (msg, wx) => {
-  botClient.callback({eventType: 'MESSAGE', body: stringify(msg)})
+  if(!msg.content || !msg.content.msg || !msg.content.msg.emoji || !msg.content.msg.emoji.$) {
+    log.error("emoji msg dont have msg.content.msg.emoji.$\n%o\n", msg)
+    return
+  }
+
+  let imageurl = msg.content.msg.emoji.$.cdnurl
+  console.log("downloading %s", imageurl)
+  let emojiId = botClient.loginData.userName + "-" + uuidv4()
+  let imageb64 = await image2base64(imageurl)
+  console.log("downloaded %d %s...", imageb64.length, imageb64.substr(0, 20))
+  fs.writeFileSync(`cache/${emojiId}`, imageb64)
+  msg.emojiId = emojiId
+  
+  botClient.callback({eventType: 'EMOJIMESSAGE', body: msg})
 })
 
 router.statusMessage(async (msg, wx) => {

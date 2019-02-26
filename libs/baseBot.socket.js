@@ -378,7 +378,7 @@ module.exports = (config, botClient) => {
 	
 	botClient.callback({eventType:'IMAGEMESSAGE', body: data})
         break
-
+        
       case 43:
         logger.info('收到来自 %s 的视频消息，包含视频数据：%s，xml内容：\n%s', data.fromUser, !!data.data, data.content)
         rawFile = data.data || null
