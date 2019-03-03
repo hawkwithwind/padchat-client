@@ -272,6 +272,14 @@ async function runEventTunnel(bot) {
 	  } else {
 	    ret = await bot.wxbot.addContact(stranger, ticket, type, content)
 	  }
+        } else if (actionType == "DeleteContact") {
+          let userId = bodym.userId
+          if (userId === undefined) {
+            log.error("delete contact message empty")
+            return
+          }
+
+          ret = await bot.wxbot.deleteContact(userId)
 	} else if (actionType == "SayHello") {
 	  stranger = bodym.stranger
 	  ticket = bodym.ticket
