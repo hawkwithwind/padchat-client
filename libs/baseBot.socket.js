@@ -128,7 +128,7 @@ module.exports = (config, botClient) => {
 
         wx.ws.isAlive = false
         wx.ws.ping(() => {})
-      }, 60 * 1000)
+      }, 5 * 60 * 1000)
       
       wx.ws.on('pong', () => {
       	wx.ws.isAlive = true
