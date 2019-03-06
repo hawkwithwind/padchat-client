@@ -107,7 +107,16 @@ module.exports = (config, botClient) => {
       logger.info('连接成功!')
       connected = true
 
-      wx.ws.isAlive = true      
+      wx.ws.isAlive = true
+      if (wx.ws.pingLoop) {
+        logger.info('再次启动，首先清除ping loop')
+        try {
+          clearInterval(wx.ws.pingLoop)
+        } catch (err) {
+          logger.error(err)
+        }
+      }
+      
       wx.ws.pingLoop = setInterval(() => {
         if(wx.ws.isAlive === false) {
           //send zabbix alert
