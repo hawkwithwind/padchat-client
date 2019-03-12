@@ -123,6 +123,8 @@ module.exports = (config, botClient) => {
           zbx_sender.addItem(`${config.zabbix.host}`, `${config.zabbix.key}`, 0).send((err, res) => {
       	    if (err) { throw err }
       	  })
+          logger.info('超时未收到pong，退出...')
+          wx.close()
       	  return
         }
 
@@ -600,13 +602,15 @@ module.exports = (config, botClient) => {
     }
   }
 
-  // process.on('uncaughtException', e => {
-  //   logger.error('Main', 'uncaughtException:', e)
-  // })
+  process.on('uncaughtException', e => {
+    logger.error('Main', 'uncaughtException:', e)
+    process.exit(1)
+  })
 
-  // process.on('unhandledRejection', e => {
-  //   logger.error('Main', 'unhandledRejection:', e)
-  // })
+  process.on('unhandledRejection', e => {
+    logger.error('Main', 'unhandledRejection:', e)
+    process.exit(1)
+  })
 
   return wx
 }
