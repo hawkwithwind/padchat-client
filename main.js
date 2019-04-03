@@ -238,7 +238,7 @@ async function runEventTunnel(bot) {
 	    log.info("%o", ret)
 	  }
         } else if (actionType == "SendImageMessage") {
-          let toUserName = bodym.toUsername
+          let toUserName = bodym.toUserName
           let payload = bodym.payload
           if (toUserName === undefined || payload === undefined ) {
             log.error("send image message empty")
