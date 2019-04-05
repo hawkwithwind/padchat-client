@@ -400,6 +400,76 @@ async function runEventTunnel(bot) {
 	    return
 	  }
 	  ret = await bot.wxbot.searchContact(userId)
+        } else if (actionType == "snsTimeline") {
+          momentId = bodym.momentId
+          if(momentId) {
+            ret = await bot.wxbot.snsTimeline(momentId)
+          } else {
+            ret = await bot.wxbot.snsTimeline()
+          }
+        } else if (actionType == "snsUserPage") {
+          userId = bodym.userId
+          momentId = bodym.momentId
+          if(!userId) {
+            log.error("snsUserPage userId null")
+            return
+          }
+          if(momentId) {
+            ret = await bot.wxbot.snsUserPage(userId, momentId)
+          } else {
+            ret = await bot.wxbot.snsUserPage(userId)
+          }
+        } else if (actionType == "snsGetObject") {
+          momentId = bodym.momentId
+          if(!momentId) {
+            log.error("snsGetObject momentId empty")
+            return
+          }
+
+          ret = await bot.wxbot.snsGetObject(momentId)
+        } else if(actionType == "snsComment"){
+          userId = bodym.userId
+          momentId = bodym.momentId
+          content = bodym.content
+          if(!userId || !momentId || !content) {
+            log.error("snsComment message empty")
+            return
+          }
+
+          ret = await bot.wxbot.snsComment(userId, momentId, content)
+        } else if(actionType == "snsLike") {
+          userId = bodym.userId
+          momentId = bodym.momentId
+          if(!userId || !momentId) {
+            log.error("snsComment message empty")
+            return
+          }
+
+          ret = await bot.wxbot.snsLike(userId, momentId)
+        } else if(actionType == "snsUpload") {
+          file = bodym.file
+          if(!file) {
+            log.error("snsUpload message empty")
+            return
+          }
+          ret = await bot.wxbot.snsUpload(file)
+        } else if (actionType == "snsobjectOP") {
+          momentId = bodym.momentId
+          type = bodym.type
+          commentId = bodym.commentId
+          commentType == bodym.commentType
+          if(!momentId || !type || !commentId || !commentType) {
+            log.error("snsobjectOP message empty")
+            return
+          }
+          ret = await bot.wxbot.snsobjectOP(momentId, type, commentId, commentType)
+        } else if (actionType == "snsSendMoment") {
+          content = bodym.content
+          if(!content) {
+            log.error("snsSendMoment message empty")
+            return
+          }
+          ret = await bot.wxbot.snsSendMoment(content)
 	} else {
 	  log.error("unsupported action", actionType)
 	}
