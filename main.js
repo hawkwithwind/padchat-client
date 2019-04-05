@@ -400,14 +400,14 @@ async function runEventTunnel(bot) {
 	    return
 	  }
 	  ret = await bot.wxbot.searchContact(userId)
-        } else if (actionType == "snsTimeline") {
+        } else if (actionType == "SnsTimeline") {
           momentId = bodym.momentId
           if(momentId) {
             ret = await bot.wxbot.snsTimeline(momentId)
           } else {
             ret = await bot.wxbot.snsTimeline()
           }
-        } else if (actionType == "snsUserPage") {
+        } else if (actionType == "SnsUserPage") {
           userId = bodym.userId
           momentId = bodym.momentId
           if(!userId) {
@@ -419,7 +419,7 @@ async function runEventTunnel(bot) {
           } else {
             ret = await bot.wxbot.snsUserPage(userId)
           }
-        } else if (actionType == "snsGetObject") {
+        } else if (actionType == "SnsGetObject") {
           momentId = bodym.momentId
           if(!momentId) {
             log.error("snsGetObject momentId empty")
@@ -427,7 +427,7 @@ async function runEventTunnel(bot) {
           }
 
           ret = await bot.wxbot.snsGetObject(momentId)
-        } else if(actionType == "snsComment"){
+        } else if(actionType == "SnsComment"){
           userId = bodym.userId
           momentId = bodym.momentId
           content = bodym.content
@@ -437,7 +437,7 @@ async function runEventTunnel(bot) {
           }
 
           ret = await bot.wxbot.snsComment(userId, momentId, content)
-        } else if(actionType == "snsLike") {
+        } else if(actionType == "SnsLike") {
           userId = bodym.userId
           momentId = bodym.momentId
           if(!userId || !momentId) {
@@ -446,14 +446,14 @@ async function runEventTunnel(bot) {
           }
 
           ret = await bot.wxbot.snsLike(userId, momentId)
-        } else if(actionType == "snsUpload") {
+        } else if(actionType == "SnsUpload") {
           file = bodym.file
           if(!file) {
             log.error("snsUpload message empty")
             return
           }
           ret = await bot.wxbot.snsUpload(file)
-        } else if (actionType == "snsobjectOP") {
+        } else if (actionType == "SnsobjectOP") {
           momentId = bodym.momentId
           type = bodym.type
           commentId = bodym.commentId
@@ -463,7 +463,7 @@ async function runEventTunnel(bot) {
             return
           }
           ret = await bot.wxbot.snsobjectOP(momentId, type, commentId, commentType)
-        } else if (actionType == "snsSendMoment") {
+        } else if (actionType == "SnsSendMoment") {
           content = bodym.content
           if(!content) {
             log.error("snsSendMoment message empty")
