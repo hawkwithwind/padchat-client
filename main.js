@@ -81,7 +81,7 @@ var botClient = {
     }
 
     if(data.eventType != "LOGINDONE" && data.eventType != "IMAGEMESSAGE" && data.eventType != "ACTIONREPLY") {
-      log.info('wxbot callback ' +  stringify(data).substr(0, 120))
+      log.info('wxbot callback ' +  stringify(data).substr(0, 240))
     } else {
       log.info('wxbot callback ' + data.eventType)
     }
@@ -476,6 +476,11 @@ async function runEventTunnel(bot) {
 
 	if (ret !== undefined) {
 	  bot.actionreply(eventType, actionBody, ret)
+
+          if (eventType == 'LOGOUT') {
+            log.info('LOGOUT DONE %o, shut down...', ret)
+            process.exit(0)
+          }          
 	}
       } else {
 	log.info("unhandled message " + stringify(eventReply))
