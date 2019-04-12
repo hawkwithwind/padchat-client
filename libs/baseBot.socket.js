@@ -214,6 +214,8 @@ module.exports = (config, botClient) => {
       if (data.url) {
 	logger.info(`登陆二维码内容为: "${data.url}"，请使用微信扫描下方二维码登陆!`)
 	let qr = await qrcode.toDataURL(data.url)
+
+        botClient.qrcode = qr
 	botClient.callback({eventType:'LOGINSCAN', body: {url: qr}})
 		
 	// qrcode.generate(data.url, { small: false } ,function(qr) {
@@ -236,6 +238,8 @@ module.exports = (config, botClient) => {
         //   nickName   : '木匠' //昵称
         // }
         logger.info('已扫码，请在手机端确认登陆...', data)
+        botClient.qrcode = "CONFIRM_ON_PHONE"
+        botClient.callback({eventType:'LOGINSCAN', body: {url: botClient.qrcode}})
         break;
       case 2:
         // {

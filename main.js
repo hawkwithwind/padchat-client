@@ -56,7 +56,12 @@ var botClient = {
   botId: undefined,
   wxbot: undefined,
   tunnel: undefined,
+  qrcode: undefined,
+  
   logindone: function(data) {
+    // remove qrcode on login done
+    this.qrcode = undefined
+    
     this.callback({eventType:'LOGINDONE', body: {
       userName: this.loginData.userName,
       wxData: this.loginInfo.wxData,
@@ -503,6 +508,9 @@ async function runEventTunnel(bot) {
   if(botClient.loginData != undefined) {
     log.info("resend login data...")
     await botClient.logindone()
+  } else if (botClient.qrcode != undefined) {
+    log.info("resend scancode ...")
+    await botClient.callback({eventType:'LOGINSCAN', body: {url: botClient.qrcode}})
   }
 
   while (botClient.flag) {
