@@ -268,12 +268,21 @@ module.exports = (config, botClient) => {
 	// 如果等待登陆超时或手机上点击了取消登陆，需要重新调用登陆
       case 3:
         logger.info('二维码已过期！请重新调用登陆接口！', data)
+        botClient.callback({eventType:'LOGOUTDONE', body:data})
+        logger.info('shut down ...')
+        process.exit(0)
         break;
       case 4:
         logger.info('手机端已取消登陆！请重新调用登陆接口！', data)
+        botClient.callback({eventType:'LOGOUTDONE', body:data})
+        logger.info('shut down ...')
+        process.exit(0)
         break;
       default:
         logger.warn('未知登陆状态！请重新调用登陆接口！', data)
+        botClient.callback({eventType:'LOGOUTDONE', body:data})
+        logger.info('shut down ...')
+        process.exit(0)
         break;
       }
     })
@@ -302,7 +311,7 @@ module.exports = (config, botClient) => {
       logger.info('微信账号已退出！', msg)
       botClient.callback({eventType:'LOGOUTDONE', body:msg})
       logger.info('shut down ...')
-      process.exit(0)      
+      process.exit(0)
     })
     .on('over', ({ msg }) => {
       logger.info('任务实例已关闭！', msg)
