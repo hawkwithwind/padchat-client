@@ -372,6 +372,8 @@ module.exports = (config, botClient) => {
         rawFile = data.data || null
         if (!rawFile || rawFile === null) {
           logger.info('图片消息 data.data 为空, 停止处理')
+          let debugId = botClient.loginData.username + "-debug-" + uuidv4()
+          fs.writeFileSync(`cache/${debugId}`, data)
           break
         }
         
@@ -380,7 +382,8 @@ module.exports = (config, botClient) => {
           .then(ret => {
 	    logger.info("%d %s", ret.status, ret.message)
             rawFile = ret.data.image || ''
-            logger.info('获取消息原始图片结果：%s, 获得图片base64尺寸：%d', ret.success, rawFile.length)
+            logger.info('获取消息原始图片结果：%s, 获得图片base64尺寸：%d',
+                        ret.success, rawFile.length)
           })
         logger.info('图片数据base64尺寸：%d', rawFile.length)
         
