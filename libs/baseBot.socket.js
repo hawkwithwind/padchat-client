@@ -370,6 +370,11 @@ module.exports = (config, botClient) => {
       case 3:
         logger.info('收到来自 %s 的图片消息，包含图片数据：%s，xml内容：\n%s', data.fromUser, !!data.data, data.content)
         rawFile = data.data || null
+        if (!rawFile || rawFile === null) {
+          logger.info('图片消息 data.data 为空, 停止处理')
+          break
+        }
+        
         logger.info('图片缩略图数据base64尺寸：%d', rawFile.length)
         await wx.getMsgImage(data)
           .then(ret => {
@@ -378,7 +383,7 @@ module.exports = (config, botClient) => {
             logger.info('获取消息原始图片结果：%s, 获得图片base64尺寸：%d', ret.success, rawFile.length)
           })
         logger.info('图片数据base64尺寸：%d', rawFile.length)
-
+        
 	if(data.content && data.fromUser) {
 	  if (/@chatroom$/.test(data.fromUser)) {
 	    data['groupId'] = data.fromUser
