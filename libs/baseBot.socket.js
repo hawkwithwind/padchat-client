@@ -316,7 +316,7 @@ module.exports = (config, botClient) => {
       botClient.callback({eventType:'LOGOUTDONE', body:msg})
       logger.info('shut down ...')
       process.exit(0)
-    })
+    })    
     .on('over', ({ msg }) => {
       logger.info('任务实例已关闭！', msg)
       botClient.callback({eventType:'LOGOUTDONE', body:msg})
@@ -466,7 +466,8 @@ module.exports = (config, botClient) => {
         // 超过30Kb的语音数据不会包含在推送信息中，需要主动拉取
         rawFile = data.data || null
         if (!rawFile) {
-          // BUG: 超过60Kb的语音数据，只能拉取到60Kb，也就是说大约36~40秒以上的语音会丢失后边部分语音内容
+          // BUG: 超过60Kb的语音数据，只能拉取到60Kb，
+          // 也就是说大约36~40秒以上的语音会丢失后边部分语音内容
           await wx.getMsgVoice(data)
             .then(ret => {
               rawFile = ret.data.voice || ''

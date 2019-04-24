@@ -194,6 +194,9 @@ async function runEventTunnel(bot) {
 	bot.handleLoginRequest(body);
       } else if (eventType == 'LOGOUT') {
 	let ret = await bot.wxbot.logout()
+      } else if (eventType == 'SHUTDOWN') {
+        log.info("recieve cmd SHUTDOWN")
+        process.exit(0)
       } else if (eventType == 'BOTACTION') {
 	if (bot.wxbot === undefined) {
 	  bot.actionreply(eventType, body, {success: false, msg: "bot instance is gone away"})
@@ -515,7 +518,7 @@ async function runEventTunnel(bot) {
 
   while (botClient.flag) {
     await botClient.tunnel.write(newEventRequest("PING", ""))
-    await sleep(10 * 1000);
+    await sleep(10 * 1000)
   }
 
   botClient.tunnel.end()
