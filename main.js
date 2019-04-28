@@ -191,7 +191,14 @@ async function runEventTunnel(bot) {
       log.info("CMD ", eventType);
       
       if (eventType == 'LOGIN') {	
-	bot.handleLoginRequest(body);
+	bot.handleLoginRequest(body)
+      } else if (eventType == 'BOTMIGRATE') {
+        let bodym = JSON.parse(body)
+        if (bodym.botId) {
+          log.info("BOT MIGRATE (%s) -> (%s)", botClient.botId, bodym.botId)
+          botClient.botId = bodym.botId
+        }
+        
       } else if (eventType == 'LOGOUT') {
 	let ret = await bot.wxbot.logout()
       } else if (eventType == 'SHUTDOWN') {
