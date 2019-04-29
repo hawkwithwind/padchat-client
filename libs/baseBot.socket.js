@@ -74,8 +74,13 @@ module.exports = (config, botClient) => {
   let server = `${config.padchatServer}:${config.padchatPort}/${config.padchatToken}`
   logger.info(`connect to server ${server}`)
 
-  let zbx_sender = new ZabbixSender({host: config.zabbix.server, port: config.zabbix.port})
-  logger.info(`connect to zabbix server ${config.zabbix.server}:${config.zabbix.port}`)
+  let zbx_sender = null
+  if (config.zabbix && config.zabbix.server && config.zabbix.port) {  
+    zbx_sender = new ZabbixSender({host: config.zabbix.server, port: config.zabbix.port})
+    logger.info(`connect to zabbix server ${config.zabbix.server}:${config.zabbix.port}`)
+  } else {
+    logger.warn('zabbix服务地址未配置，忽略')
+  }
 
   const wx = new Padchat(server)
   logger.info('padchat client started')
@@ -119,10 +124,12 @@ module.exports = (config, botClient) => {
       
       wx.ws.pingLoop = setInterval(() => {
         if(wx.ws.isAlive === false) {
-          //send zabbix alert
-          zbx_sender.addItem(`${config.zabbix.host}`, `${config.zabbix.key}`, 0).send((err, res) => {
-      	    if (err) { throw err }
-      	  })
+          if(zbx_sender) {
+            //send zabbix alert
+            zbx_sender.addItem(`${config.zabbix.host}`, `${config.zabbix.key}`, 0).send((err, res) => {              
+      	      if (err) { throw err }
+      	    })
+          }
           logger.info('超时未收到pong，退出...')
           wx.close()
       	  return
@@ -134,19 +141,23 @@ module.exports = (config, botClient) => {
       
       wx.ws.on('pong', () => {
       	wx.ws.isAlive = true
-      	//send zabbix ok
-      	zbx_sender.addItem(`${config.zabbix.host}`, `${config.zabbix.key}`, 1).send((err, res) => {
-      	  if (err) { throw err }
-          //logger.info('zbx %o', res)
-      	})
+        if(zbx_sender) {
+      	  //send zabbix ok
+      	  zbx_sender.addItem(`${config.zabbix.host}`, `${config.zabbix.key}`, 1).send((err, res) => {
+      	    if (err) { throw err }
+            //logger.info('zbx %o', res)
+      	  })
+        }
       })
 
       wx.ws.on('close', () => {
       	wx.ws.isAlive = false
-      	//send zabbix alert
-      	zbx_sender.addItem(`${config.zabbix.host}`, `${config.zabbix.key}`, 0).send((err, res) => {
-      	  if (err) { throw err }
-      	})
+        if(zbx_sender) {
+      	  //send zabbix alert
+      	  zbx_sender.addItem(`${config.zabbix.host}`, `${config.zabbix.key}`, 0).send((err, res) => {
+      	    if (err) { throw err }
+      	  })
+        }
       	clearInterval(wx.ws.pingLoop)
       })
 
