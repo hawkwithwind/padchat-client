@@ -63,6 +63,8 @@ module.exports = {
             wxMsg['groupId'] = wxMsg.fromUser
             wxMsg['fromUser'] = wxMsg.content.substr(0, wxMsg.content.indexOf(':\n'))
             wxMsg['content'] = wxMsg.content.substr(wxMsg.content.indexOf(':\n') + 2)
+          } else if (/@chatroom$/.test(wxMsg.toUser)) {
+            wxMsg['groupId'] = wxMsg.toUser
           }
           // 仅推送30秒之前的数据
           let {timestamp} = wxMsg
@@ -80,6 +82,8 @@ module.exports = {
             wxMsg['groupId'] = wxMsg.fromUser
             wxMsg['fromUser'] = wxMsg.content.substr(0, wxMsg.content.indexOf(':\n'))
             wxMsg['content'] = wxMsg.content.substr(wxMsg.content.indexOf(':\n') + 2)
+          } else if (/@chatroom$/.test(wxMsg.toUser)) {
+            wxMsg['groupId'] = wxMsg.toUser
           }
           //
           try {
@@ -124,7 +128,9 @@ module.exports = {
 	    wxMsg['groupId'] = wxMsg.fromUser
 	    wxMsg['fromUser'] = wxMsg.content.substr(0, wxMsg.content.indexOf(':\n'))
 	    wxMsg['content'] = wxMsg.content.substr(wxMsg.content.indexOf(':\n') + 2)	    
-	  }
+	  } else if (/@chatroom$/.test(wxMsg.toUser)) {
+            wxMsg['groupId'] = wxMsg.toUser
+          }
 
 	  try {
 	    let xml = typeof wxMsg['content'] === 'object' ? wxMsg['content'] : await parseXml(wxMsg['content'])
@@ -167,7 +173,9 @@ module.exports = {
 	    wxMsg['groupId'] = wxMsg.fromUser
 	    wxMsg['fromUser'] = wxMsg.content.substr(0, wxMsg.content.indexOf(':\n'))
 	    wxMsg['content'] = wxMsg.content.substr(wxMsg.content.indexOf(':\n') + 2)
-	  }
+	  } else if (/@chatroom$/.test(wxMsg.toUser)) {
+            wxMsg['groupId'] = wxMsg.toUser
+          }
 
 	  try {
 	    let xml = typeof wxMsg['content'] === 'object' ? wxMsg['content'] : await parseXml(wxMsg['content'])
