@@ -403,7 +403,9 @@ module.exports = (config, botClient) => {
 	    data['groupId'] = data.fromUser
 	    data['fromUser'] = data.content.substr(0, data.content.indexOf(':\n'))
 	    data['content'] = data.content.substr(data.content.indexOf(':\n') + 2)
-	  }
+	  } else if (/@chatroom$/.test(data.toUser)) {
+            data['groupId'] = data.toUser
+          }
 	}
 	
 	/*
