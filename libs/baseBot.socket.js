@@ -105,7 +105,9 @@ module.exports = (config, botClient) => {
 	logger.debug(`未能连接服务器！将重试连接服务器。`)
       }
       // 重新启动websocket连接
-      wx.start()
+      //wx.start()
+      logger.info("不会重新连接服务器，正在关闭实例，等待重启")
+      process.exit(0)
     })
     .on('open', async () => {
       let ret
