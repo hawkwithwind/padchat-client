@@ -8,6 +8,7 @@ const qrcode  = require('qrcode')
 const x2j     = require('xml2js')
 const uuidv4  = require('uuid/v4')
 var   ZabbixSender = require('node-zabbix-sender')
+const OSS     = require('ali-oss')
 
 /**
 * 创建日志目录
@@ -73,6 +74,19 @@ try {
 module.exports = (config, botClient) => {
   let server = `${config.padchatServer}:${config.padchatPort}/${config.padchatToken}`
   logger.info(`connect to server ${server}`)
+
+  var ossClient = null
+  
+  if (!config.oss) {
+    logger.error("cannot read config.oss, ignore")
+  } else {
+    ossClient = new OSS({
+      region: config.oss.region,
+      accessKeyId: config.oss.accessKeyId,
+      accessKeySecret: config.oss.accessKeySecret,
+      bucket: config.oss.bucket,
+    })
+  }
 
   let zbx_sender = null
   if (config.zabbix && config.zabbix.server && config.zabbix.port) {  
@@ -426,6 +440,19 @@ module.exports = (config, botClient) => {
 	logger.info('写入图片文件 ' + `cache/${imageId}`)
 	logger.info('rawFile %d', rawFile.length)
 	logger.info(rawFile.substr(0, 80))
+
+        if (ossClient) {
+          logger.info(`上传图片至aliyun oss... chathub/images/${imageId}`)
+          ossClient.put(`chathub/images/${imageId}`, rawFile).then(result=>{
+            if(result.res && result.res.status == 200) {
+              logger.info(`上传图片 ${result.name} 完成`)
+            } else {
+              logger.info('上传图片返回', result)
+            }
+          }).catch(err=>{
+            logger.error('上传图片失败', err)
+          })
+        }
 	
 	botClient.callback({eventType:'IMAGEMESSAGE', body: data})
         break
