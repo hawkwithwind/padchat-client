@@ -443,7 +443,7 @@ module.exports = (config, botClient) => {
 
         if (ossClient) {
           logger.info(`上传图片至aliyun oss... chathub/images/${imageId}`)
-          ossClient.put(`chathub/images/${imageId}`, rawFile).then(result=>{
+          ossClient.put(`chathub/images/${imageId}`, `cache/${imageId}`).then(result=>{
             if(result.res && result.res.status == 200) {
               logger.info(`上传图片 ${result.name} 完成`)
             } else {
