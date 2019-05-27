@@ -283,9 +283,11 @@ module.exports = (config, botClient) => {
         //   nickName   : '木匠'          //昵称
         //   userName   : 'wxid_xxxxxx',  // 微信账号id，全局唯一
         //   phoneNumber: '18012345678',  // 微信账号绑定的手机号
-        // }
+        // }        
         switch (data.subStatus) {
         case 0:
+          botClient.callback({eventType:'CONTACTINFO', body: {userName: data.userName, nickName: data.nickName, smallHead: data.headUrl} })
+          
           logger.info('扫码成功！登陆成功！', data)
           break;
         case 1:
