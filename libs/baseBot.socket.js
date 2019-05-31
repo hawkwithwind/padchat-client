@@ -355,6 +355,8 @@ module.exports = (config, botClient) => {
     .on('loaded', async () => {
       logger.info('通讯录同步完毕！')
 
+      botClient.callback({eventType:'CONTACTSYNCDONE', body:{}})
+
       // 主动触发同步消息
       await wx.syncMsg()
 
