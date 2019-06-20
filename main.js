@@ -11,6 +11,7 @@ var log4js = require('log4js')
 var stringify = require('json-stringify')
 const uuidv4  = require('uuid/v4')
 const image2base64 = require('image-to-base64')
+const OSS     = require('ali-oss')
 
 var baseBot = require('./libs/baseBot.socket')
 let router = require('./libs/wxSocketMsgRouter')
@@ -35,6 +36,18 @@ try {
 }
 
 const log = log4js.getLogger('rpc')
+var ossClient = null
+
+if (!config.oss) {
+  logger.error("cannot read config.oss, ignore")
+} else {
+  ossClient = new OSS({
+    region: config.oss.region,
+    accessKeyId: config.oss.accessKeyId,
+    accessKeySecret: config.oss.accessKeySecret,
+    bucket: config.oss.bucket,
+  })
+}
 
 function newEventRequest(eventType, body) {
   req = new messages.EventRequest()
@@ -162,6 +175,19 @@ router.emoji(async (msg, wx) => {
   console.log("downloaded %d %s...", imageb64.length, imageb64.substr(0, 20))
   fs.writeFileSync(`cache/${emojiId}`, imageb64)
   msg.emojiId = emojiId
+
+  if(ossClient) {
+    logger.info(`上传emoji至aliyun oss... chathub/emoji/${emojiId}`)
+    ossClient.put(`chathub/emoji/${emojiId}`, Buffer.from(imageb64, 'base64')).then(result=>{
+      if(result.res && result.res.status == 200) {
+        logger.info(`上传emoji ${result.name} 完成`)
+      } else {
+        logger.info('上传emoji返回', result)
+      }
+    }).catch(err=>{
+      logger.error('上传emoji失败', err)
+    })
+  }
   
   botClient.callback({eventType: 'EMOJIMESSAGE', body: msg})
 })
