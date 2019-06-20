@@ -348,7 +348,8 @@ module.exports = (config, botClient) => {
     })    
     .on('over', ({ msg }) => {
       logger.info('任务实例已关闭！', msg)
-      botClient.callback({eventType:'LOGOUTDONE', body:msg})
+      // 此时不应该登出，应该重启后服务器通知重连
+      //botClient.callback({eventType:'LOGOUTDONE', body:msg})
       logger.info('shut down ...')
       process.exit(0)
     })
