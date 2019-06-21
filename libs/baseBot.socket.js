@@ -97,6 +97,7 @@ module.exports = (config, botClient) => {
   }
 
   const wx = new Padchat(server)
+  wx.sendTimeout = 30 // set time out to 30 seconds, default is 30 * 1000, but inner code will *1000 again, so overide it.
   logger.info('padchat client started')
 
   let disconnectCount = 0      // 断开计数
