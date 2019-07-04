@@ -70,6 +70,9 @@ var botClient = {
   wxbot: undefined,
   tunnel: undefined,
   qrcode: undefined,
+
+  mqconn: undefined,
+  mqchannel: undefined,
   
   logindone: function(data) {
     // remove qrcode on login done
@@ -511,6 +514,30 @@ async function runEventTunnel(bot) {
             return
           }
           ret = await bot.wxbot.snsSendMoment(content)
+        } else if (actionType == "GetLabelList") {
+          ret = await bot.wxbot.getLabelList()
+        } else if (actionType == "AddLabel") {
+          label = bodym.label
+          if(!label) {
+            log.error("addLabel message empty")
+            return
+          }
+          ret = await bot.wxbot.addLabel(label)
+        } else if (actionType == "DeleteLabel") {
+          labelId = bodym.labelId
+          if(!labelId) {
+            log.error("deleteLabel message empty")
+            return
+          }
+          ret = await bot.wxbot.deleteLabel(labelId)
+        } else if (actionType == "setLabel") {
+          userId = bodym.userId
+          labelId = bodym.labelId
+          if(!userId || !labelId) {
+            log.error("setLabel message empty")
+            return
+          }
+          ret = await bot.wxbot.setLabel(userId, labelId)
 	} else {
 	  log.error("unsupported action", actionType)
 	}
