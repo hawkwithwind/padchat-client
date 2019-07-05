@@ -530,7 +530,7 @@ async function runEventTunnel(bot) {
             return
           }
           ret = await bot.wxbot.deleteLabel(labelId)
-        } else if (actionType == "setLabel") {
+        } else if (actionType == "SetLabel") {
           userId = bodym.userId
           labelId = bodym.labelId
           if(!userId || !labelId) {
