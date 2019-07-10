@@ -71,9 +71,6 @@ var botClient = {
   tunnel: undefined,
   qrcode: undefined,
 
-  mqconn: undefined,
-  mqchannel: undefined,
-  
   logindone: function(data) {
     // remove qrcode on login done
     this.qrcode = undefined
