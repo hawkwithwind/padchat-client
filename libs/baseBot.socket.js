@@ -233,6 +233,8 @@ module.exports = (config, botClient) => {
       ret = await wx.login('qrcode')
       if (!ret.success) {
 	logger.error('使用qrcode登录模式失败！', ret)
+        logger.info('shut down ...')
+        process.exit(0)
 	return
       }
       logger.info('使用qrcode登录模式！')
