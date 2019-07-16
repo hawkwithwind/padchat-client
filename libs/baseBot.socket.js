@@ -9,7 +9,8 @@ const x2j     = require('xml2js')
 const uuidv4  = require('uuid/v4')
 var   ZabbixSender = require('node-zabbix-sender')
 const OSS     = require('ali-oss')
-var loadImage = require('blueimp-load-image')
+//var sizeof    = require('buffer-image-size')
+//const sharp   = require('sharp')
 
 /**
 * 创建日志目录
@@ -414,6 +415,8 @@ module.exports = (config, botClient) => {
         }
         
         logger.info('图片缩略图数据base64尺寸：%d', rawFile.length)
+        let thumbnail = rawFile
+        
         await wx.getMsgImage(data)
           .then(ret => {
 	    logger.info("%d %s", ret.status, ret.message)
@@ -443,16 +446,61 @@ module.exports = (config, botClient) => {
           })
 	*/
 
-	let imageId = botClient.loginData.userName + "-" + uuidv4()
-	data.imageId = imageId
-	fs.writeFileSync(`cache/${imageId}`, rawFile)
-	logger.info('写入图片文件 ' + `cache/${imageId}`)
-	logger.info('rawFile %d', rawFile.length)
-	logger.info(rawFile.substr(0, 80))
+        let imageId = botClient.loginData.userName + "-" + uuidv4()
+        let imagePath = `cache/${imageId}`
+        let thumbPath = `cache/${imageId}-thumbnail`
 
-        var imageUrlJPEG = 'data:image/jpeg;base64,' + rawFile
-        loadImage(imageUrlJPEG, (img, data) => {
-          
+        data.imageId = imageId
+        data.thumbnailId = `${imageId}-thumbnail`
+        
+        /*
+        let img = Buffer.from(rawFile, 'base64')
+        let dimensions = sizeof(img)
+        let imgWidth   = dimensions.width
+        let imgHeight  = dimensions.height
+
+        let scaleWidth = imgWidth
+        if (scaleWidth > 400) {
+          scaleWidth = 400
+        }
+
+        let thumbimg = await sharp(img)
+            .resize({width: scaleWidth})
+            .toBuffer()
+        */
+                
+        if (ossClient) {
+          try {
+            logger.info(`上传缩略图至aliyun oss... chathub/images/${imageId}-thumbnail`)
+            let thumbresult = await ossClient.put(`chathub/images/${imageId}-thumbnail`, Buffer.from(thumbnail, 'base64'))
+            if (thumbresult.res && thumbresult.res.status == 200) {
+              logger.info(`上传图片 ${thumbresult.name} 完成`)
+            } else {
+              logger.error('上传图片返回', thumbresult)
+            }
+          } catch(err) {
+            logger.error('上传缩略图失败', err)
+          }
+        }
+
+        /*
+        fs.writeFile(thumbPath, thumbimg, (err) => {
+          if (err) {
+            logger.error(`写入缩略图 ${thumbPath} 失败`)
+          } else {
+            logger.info(`写入缩略图 ${thumbPath} 成功`)
+          }          
+        })
+        */
+        
+	fs.writeFile(imagePath, rawFile, (err) => {
+          if (err) {
+            logger.error('写入图片文件 ' + imagePath + '失败', err)
+          } else {
+            logger.info('写入图片文件 ' + imagePath)
+	    logger.info('rawFile %d', rawFile.length)
+	    logger.info(rawFile.substr(0, 80))
+          }
         })
 
         if (ossClient) {
