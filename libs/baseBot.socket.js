@@ -9,6 +9,7 @@ const x2j     = require('xml2js')
 const uuidv4  = require('uuid/v4')
 var   ZabbixSender = require('node-zabbix-sender')
 const OSS     = require('ali-oss')
+var loadImage = require('blueimp-load-image')
 
 /**
 * 创建日志目录
@@ -421,7 +422,7 @@ module.exports = (config, botClient) => {
                         ret.success, rawFile.length)
           })
         logger.info('图片数据base64尺寸：%d', rawFile.length)
-        
+
 	if(data.content && data.fromUser) {
 	  if (/@chatroom$/.test(data.fromUser)) {
 	    data['groupId'] = data.fromUser
@@ -448,6 +449,11 @@ module.exports = (config, botClient) => {
 	logger.info('写入图片文件 ' + `cache/${imageId}`)
 	logger.info('rawFile %d', rawFile.length)
 	logger.info(rawFile.substr(0, 80))
+
+        var imageUrlJPEG = 'data:image/jpeg;base64,' + rawFile
+        loadImage(imageUrlJPEG, (img, data) => {
+          
+        })
 
         if (ossClient) {
           logger.info(`上传图片至aliyun oss... chathub/images/${imageId}`)

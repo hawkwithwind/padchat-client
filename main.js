@@ -180,12 +180,12 @@ router.emoji(async (msg, wx) => {
     logger.info(`上传emoji至aliyun oss... chathub/emoji/${emojiId}`)
     ossClient.put(`chathub/emoji/${emojiId}`, Buffer.from(imageb64, 'base64')).then(result=>{
       if(result.res && result.res.status == 200) {
-        logger.info(`上传emoji ${result.name} 完成`)
+        log.info(`上传emoji ${result.name} 完成`)
       } else {
-        logger.info('上传emoji返回', result)
+        log.info('上传emoji返回', result)
       }
     }).catch(err=>{
-      logger.error('上传emoji失败', err)
+      log.error('上传emoji失败', err)
     })
   }
   
