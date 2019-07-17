@@ -145,9 +145,13 @@ module.exports = (config, botClient) => {
         if(wx.ws.isAlive === false) {
           if(zbx_sender) {
             //send zabbix alert
-            zbx_sender.addItem(`${config.zabbix.host}`, `${config.zabbix.key}`, 0).send((err, res) => {              
-      	      if (err) { throw err }
-      	    })
+            try {
+              zbx_sender.addItem(`${config.zabbix.host}`, `${config.zabbix.key}`, 0).send((err, res) => {              
+      	        if (err) { throw err }
+      	      })
+            } catch(e) {
+              logger.error(e)
+            }
           }
           logger.info('超时未收到pong，退出...')
           wx.close()
@@ -161,21 +165,29 @@ module.exports = (config, botClient) => {
       wx.ws.on('pong', () => {
       	wx.ws.isAlive = true
         if(zbx_sender) {
-      	  //send zabbix ok
-      	  zbx_sender.addItem(`${config.zabbix.host}`, `${config.zabbix.key}`, 1).send((err, res) => {
-      	    if (err) { throw err }
-            //logger.info('zbx %o', res)
-      	  })
+          try {
+      	    //send zabbix ok
+      	    zbx_sender.addItem(`${config.zabbix.host}`, `${config.zabbix.key}`, 1).send((err, res) => {
+      	      if (err) { throw err }
+              //logger.info('zbx %o', res)
+      	    })
+          } catch(e) {
+            logger.error(e)
+          }
         }
       })
 
       wx.ws.on('close', () => {
       	wx.ws.isAlive = false
         if(zbx_sender) {
-      	  //send zabbix alert
-      	  zbx_sender.addItem(`${config.zabbix.host}`, `${config.zabbix.key}`, 0).send((err, res) => {
-      	    if (err) { throw err }
-      	  })
+          try {
+      	    //send zabbix alert
+      	    zbx_sender.addItem(`${config.zabbix.host}`, `${config.zabbix.key}`, 0).send((err, res) => {
+      	      if (err) { throw err }
+      	    })
+          } catch(e) {
+            logger.error(e)
+          }
         }
       	clearInterval(wx.ws.pingLoop)
       })
