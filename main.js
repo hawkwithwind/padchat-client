@@ -39,7 +39,7 @@ const log = log4js.getLogger('rpc')
 var ossClient = null
 
 if (!config.oss) {
-  logger.error("cannot read config.oss, ignore")
+  log.error("cannot read config.oss, ignore")
 } else {
   ossClient = new OSS({
     region: config.oss.region,
@@ -177,7 +177,7 @@ router.emoji(async (msg, wx) => {
   msg.emojiId = emojiId
 
   if(ossClient) {
-    logger.info(`上传emoji至aliyun oss... chathub/emoji/${emojiId}`)
+    log.info(`上传emoji至aliyun oss... chathub/emoji/${emojiId}`)
     ossClient.put(`chathub/emoji/${emojiId}`, Buffer.from(imageb64, 'base64')).then(result=>{
       if(result.res && result.res.status == 200) {
         log.info(`上传emoji ${result.name} 完成`)
@@ -263,6 +263,18 @@ async function runEventTunnel(bot) {
 	  }
 	
 	  ret = await bot.wxbot.sendMsg(toUserName, content, atList)
+    if (ret.success) {
+      let res = await bot.wxbot.getMyInfo();
+      const myInfo = res.data
+      res = await bot.wxbot.getContact(myInfo.userName)
+      if (res.success) {
+        const myContact = res.data
+        ret.data = Object.assign(ret.data, {
+          content: content,
+          description: `${myContact.nickName} : ${content}`
+        })
+      }
+    }
 	} else if (actionType == "SendAppMessage") {
 	  let toUserName = bodym.toUserName
 	  if (bodym.object) {
@@ -289,7 +301,38 @@ async function runEventTunnel(bot) {
           ret = await bot.wxbot.sendImage(toUserName, payload)
           log.info("send image %d returned %o", payload.length, ret)
           log.info(payload.substr(0, 80))
-          
+
+          // sdk 说，发送图片超时不一定代表发送失败, 所以不判断 ret.success
+
+          let imageId = botClient.loginData.userName + "-" + uuidv4()
+
+          if(ossClient) {
+            try {
+              log.info(`上传 发送图片 至aliyun oss... chathub/images/${imageId}`)
+
+              const result = await ossClient.put(`chathub/images/${imageId}`, Buffer.from(payload, "base64"))
+              if(result.res && result.res.status === 200) {
+                log.info(`上传图片 ${result.name} 完成`)
+              } else {
+                imageId = null
+                log.info('上传图片返回', result)
+              }
+            } catch (e) {
+              log.error('上传 发送图片 失败', e)
+              imageId = null
+            }
+          }
+
+          let res = await bot.wxbot.getMyInfo();
+          const myInfo = res.data
+          res = await bot.wxbot.getContact(myInfo.userName);
+          if (res.success) {
+            const myContact = res.data
+            ret.data = Object.assign(ret.data, {
+              description: `${myContact.nickName} : [图片]`,
+              imageId
+            })
+          }
 	} else if (actionType == "SendImageResourceMessage") {
 	  let toUserName = bodym.toUserName
 	  let imageId = bodym.imageId
